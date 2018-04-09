@@ -1,0 +1,26 @@
+{ "exers": [
+     {"name": "Squats", "progs": 
+        ["Assisted squats", "Deep assisted squats", "Squats", "Deep squats", "Bulgarian split squats", "Beginner shrimp squats", "Assisted one legged squats", "Balance-assisted one legged squats", "Weighted one legged squats", "One-legged squats", "Renegade pistols", "Intermediate shrimps", "Advanced shrimps"]
+     },
+     {"name": "Pull ups", "progs":
+        ["Leg assisted pull ups", "Jackknife pull ups", "Eccentric pull ups", "Half pull ups", "Pull ups", "Close grip pull ups", "Wide grip pull ups", "Archer pull ups", "Sternum pull ups", "Belly button pull ups", "One arm towel-assisted pull ups", "One arm towel-assisted pull ups and eccentrics", "Half one arm pull ups", "One arm pull ups"]
+     },
+     {"name": "Handstand push ups", "progs":
+        ["Incline pike push ups", "Incline pike diamond push ups", "Pike push ups", "Pike diamond push ups", "Decline pike push ups", "Decline pike diamond push ups", "Wall bent waist handstand push up", "Wall bent waist handstand diamond push ups", "Wall half handstand push up", "Wall handstand push ups", "Wall handstand diamond push ups", "Wall raised handstand push ups"]
+     },
+     {"name": "Leg raises", "progs":
+        ["Flat knee raises", "Flat bent leg raises", "Flat straight leg raises", "Forearm knee raises", "Hanging knee raises", "Forearm bent leg raises", "Hanging bent leg raises", "Forearm straight leg raises", "Hanging straight leg raises", "Hanging bent leg V-raises", "Hanging straight leg V-raises", "Hanging fan raises", "Hanging V-raise windshield wipers", "One arm hanging leg raises" ]
+     },
+     {"name": "Push ups", "progs":
+        ["Wall push ups", "Box push ups", "Three quarter push ups", "Three quarters push ups + 5s eccentric push up", "Push ups", "Elbows in push ups", "Diamond push ups", "Uneven push ups", "Decline push ups", "Decline elbows in push ups", "Decline diamond push ups", "Wall one arm push ups", "Incline one arm push ups", "One arm push ups", "Decline one arm push ups" ]
+     },
+     {"name": "Dips", "progs":
+        ["Bent knee bench dips", "Straight legs bench dips", "One elevated leg, straight legs bench dips", "Elevated legs bench dips", "One extended leg, elevated leg bench dips", "Legs supported dips", "One leg supported dips", "Jumping and 5s eccentric dips", "Half dips", "Dips", "Legs forward dips", "Modified Russian dips", "Russian dips" ]
+     },
+     {"name": "Rows", "progs":
+        ["Vertical pulls", "Vertical pulls with a towel", "Inverted rows legs bent", "Inverted rows, straight legs", "Inverted rows, one leg extended", "Inverted row legs elevated", "Inverted rows legs elevated, one leg extended", "Tuck knees, front lever rows", "Avanced tuck knees, front lever rows", "One tuck knee, one leg extended, front lever rows", "Straddle legs front lever rows", "Front lever rows" ]
+     },
+     {"name": "Planks", "progs":
+        ["Kneeling plank", "Kneeling side plank", "Plank", "Side plank", "Decline plank", "Leg lift plank", "Arm and leg lift plank", "Arm and leg lift side plank", "Wall plank"]
+     }     
+] }
