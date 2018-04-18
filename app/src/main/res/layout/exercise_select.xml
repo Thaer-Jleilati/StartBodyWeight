@@ -16,13 +16,26 @@
         android:layout_weight="20"/>
 
     <Button
-        android:id="@+id/b_sel_increase_reps"
+        android:id="@+id/b_sel_increase_reps_big"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:minHeight="0dp"
         android:minWidth="0dp"
-        android:onClick="incrementSet"
+        android:onClick="incrementSetBig"
+        android:padding="0px"
+        android:layout_margin="0px"
+        android:text="↑↑"
+        android:layout_weight="1"/>
+    <Button
+        android:id="@+id/b_sel_increase_reps_small"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:minHeight="0dp"
+        android:minWidth="0dp"
+        android:onClick="incrementSetSmall"
         android:text="↑"
+        android:padding="0px"
+        android:layout_margin="0px"
         android:layout_weight="1"/>
     <TextView
         android:id="@+id/tv_sel_rep_1"
@@ -61,12 +74,25 @@
         android:gravity="center"
         android:text="0" />
     <Button
-        android:id="@+id/b_sel_reduce_reps"
+        android:id="@+id/b_sel_reduce_reps_small"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:minHeight="0dp"
         android:minWidth="0dp"
-        android:onClick="decrementSet"
+        android:onClick="decrementSetSmall"
         android:layout_weight="1"
+        android:padding="0px"
+        android:layout_margin="0px"
         android:text="↓"/>
+    <Button
+        android:id="@+id/b_sel_reduce_reps_big"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:minHeight="0dp"
+        android:minWidth="0dp"
+        android:onClick="decrementSetBig"
+        android:layout_weight="1"
+        android:padding="0px"
+        android:layout_margin="0px"
+        android:text="↓↓"/>
 </LinearLayout>

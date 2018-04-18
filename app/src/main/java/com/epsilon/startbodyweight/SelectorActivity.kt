@@ -13,23 +13,28 @@ import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
 import android.widget.LinearLayout
 import android.widget.Spinner
-import com.epsilon.startbodyweight.data.JSONdata
-import com.epsilon.startbodyweight.data.JSONdata.Companion.isTimedExercise
-import com.epsilon.startbodyweight.data.MyExercises
+import com.epsilon.startbodyweight.data.ExerciseEntity
+import com.epsilon.startbodyweight.data.ExerData
+import com.epsilon.startbodyweight.data.ExerData.Companion.MAX_EXERCISE_REPS
+import com.epsilon.startbodyweight.data.ExerData.Companion.MAX_EXERCISE_TIME
+import com.epsilon.startbodyweight.data.ExerData.Companion.MIN_EXERCISE_REPS
+import com.epsilon.startbodyweight.data.ExerData.Companion.MIN_EXERCISE_TIME
 import com.epsilon.startbodyweight.data.RoomDB
 import kotlinx.android.synthetic.main.activity_selector.*
 import kotlinx.android.synthetic.main.exercise_select.view.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
+import kotlin.math.max
+import kotlin.math.min
+
 
 class SelectorActivity : AppCompatActivity() {
-    //data class ExerciseViewCreateInfo(val exerName: String, val exerNum: Int, val progs: List<String>?, val reps1: Int, val reps2: Int, val reps3: Int, val setTime: Int)
     private val LTAG = SelectorActivity::class.qualifiedName
-    private val mExerciseList = ArrayList<MyExercises>()
+    private val mExerciseList = ArrayList<ExerciseEntity>()
     private lateinit var mExerciseSelectAdapter: ExerciseSelectAdapter
 
-    inner class ExerciseSelectAdapter(context: Context, exercise: ArrayList<MyExercises>):
-            ArrayAdapter<MyExercises>(context, 0, exercise) {
+    inner class ExerciseSelectAdapter(context: Context, exercise: ArrayList<ExerciseEntity>):
+            ArrayAdapter<ExerciseEntity>(context, 0, exercise) {
 
         override fun getView(position: Int, inputView: View?, parent: ViewGroup): View {
             // Get the data item for this position
@@ -53,13 +58,10 @@ class SelectorActivity : AppCompatActivity() {
                 override fun onNothingSelected(parent: AdapterView<*>?) {}
                 override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long)
                 {
-                    //exercise.progressionNumber = inputView.sp_sel_exer.selectedItemPosition
                     exercise.progressionNumber = position
                     exercise.progressionName = (parent as Spinner).selectedItem.toString()
-                    Log.e("BAYYY", "num ${exercise.progressionNumber} name ${exercise.progressionName}")
                 }
             }
-
 
             if (exercise.isTimedExercise) {
                 // Hide reps, set time
@@ -97,7 +99,7 @@ class SelectorActivity : AppCompatActivity() {
     private fun populateAdapterWithExercises(exerciseSelectAdapter: ExerciseSelectAdapter, loadFromDB: Boolean) {
         Log.d(LTAG, "Adding select exercise list views. Load from DB: " + loadFromDB)
 
-        val completeExerciseList = JSONdata.getExerciseList(resources)
+        val completeExerciseList = ExerData.getExerciseList(resources)
         if (completeExerciseList == null || completeExerciseList.isEmpty()) {
             Log.e(LTAG, "Failed to load exercise list from JSON. Exiting.")
             return
@@ -120,53 +122,80 @@ class SelectorActivity : AppCompatActivity() {
                     mExerciseSelectAdapter.addAll(myDBExercises)
                 } else {
                     // Loading exercises from JSON with defaults
-                    mExerciseSelectAdapter.addAll(
-                            completeExerciseList.orEmpty().mapIndexed { i, it ->
-                                MyExercises(it.name, i, "", 0,
-                                        4, 4, 4, 30, isTimedExercise(it.name),
-                                        0,
-                                        0, 0, 0, 0, it.progs)
-                            }
-                    )
+                    mExerciseSelectAdapter.addAll( ExerData.convertToExerciseEntityList(completeExerciseList))
                 }
                 mExerciseSelectAdapter.notifyDataSetChanged()
             }
         }
     }
 
+    fun incrementSetSmall(v:View){
+        incrementSet(v, smallIncrement = true)
+    }
 
-    fun incrementSet(v: View) {
+    fun incrementSetBig(v:View){
+        incrementSet(v, smallIncrement = false)
+    }
+
+    private fun incrementSet(v: View, smallIncrement: Boolean) {
+        val exerciseSelectView = v.parent as LinearLayout
+        val position = exerciseSelectView.tag as Int
+        val exercise = mExerciseSelectAdapter.getItem(position)
+
+        if (exercise.isTimedExercise) {
+            val timeIncrement = if (smallIncrement) 5 else 10
+            exercise.setTime = min(exercise.setTime + timeIncrement, MAX_EXERCISE_TIME)
+            exerciseSelectView.tv_sel_time.text = Integer.toString(exercise.setTime)
+        } else {
+            var (numReps1, numReps2, numReps3) =
+                    if (smallIncrement) {
+                        ExerData.computeSmallExerciseIncrements(exercise.set1Reps, exercise.set2Reps, exercise.set3Reps)
+                    } else {
+                        ExerData.computeBigExerciseIncrements(exercise.set1Reps, exercise.set2Reps, exercise.set3Reps)
+                    }
+            if (ExerData.exceededMaxReps(numReps1, numReps2, numReps3)) {
+                numReps1 = MAX_EXERCISE_REPS
+                numReps2 = MAX_EXERCISE_REPS
+                numReps3 = MAX_EXERCISE_REPS
+            }
+
+            updateRepsInList(exercise, numReps1, numReps2, numReps3)
+            setRepsInView(exerciseSelectView, numReps1, numReps2, numReps3)
+        }
+    }
+
+    fun decrementSetSmall(v:View){
+        decrementSet(v, smallDecrement = true)
+    }
+
+    fun decrementSetBig(v:View){
+        decrementSet(v, smallDecrement = false)
+    }
+
+
+    private fun decrementSet(v: View, smallDecrement: Boolean) {
         val exerciseSelectView = v.parent as LinearLayout
         val position = exerciseSelectView.tag as Int
         val exercise = mExerciseSelectAdapter.getItem(position)
         if (exercise.isTimedExercise) {
-            exercise.setTime += 5
-            if (exercise.setTime > 60) exercise.setTime = 60
+            val timeDecrement = if (smallDecrement) 5 else 10
+            exercise.setTime = max(exercise.setTime - timeDecrement, MIN_EXERCISE_TIME)
             exerciseSelectView.tv_sel_time.text = Integer.toString(exercise.setTime)
         } else {
-            var numReps = exercise.set1Reps
-            numReps++
-            if (numReps > 8) numReps = 8
-            // TODO support more granular seting
-            updateRepsInList(exercise, numReps, numReps, numReps)
-            setRepsInView(exerciseSelectView, numReps, numReps, numReps)
-        }
-    }
+            var (numReps1, numReps2, numReps3) =
+                    if (smallDecrement) {
+                        ExerData.computeSmallExerciseDecrements(exercise.set1Reps, exercise.set2Reps, exercise.set3Reps)
+                    } else {
+                        ExerData.computeBigExerciseDecrements(exercise.set1Reps, exercise.set2Reps, exercise.set3Reps)
+                    }
+            if (ExerData.deceededMinReps(numReps1, numReps2, numReps3)) {
+                numReps1 = MIN_EXERCISE_REPS
+                numReps2 = MIN_EXERCISE_REPS
+                numReps3 = MIN_EXERCISE_REPS
+            }
 
-    fun decrementSet(v: View) {
-        val exerciseSelectView = v.parent as LinearLayout
-        val position = exerciseSelectView.tag as Int
-        val exercise = mExerciseSelectAdapter.getItem(position)
-        if (isTimedExercise(exercise.exerciseName)) {
-            exercise.setTime -= 5
-            if (exercise.setTime < 30) exercise.setTime = 30
-            exerciseSelectView.tv_sel_time.text = Integer.toString(exercise.setTime)
-        } else {
-            var numReps = exercise.set1Reps
-            numReps--
-            if (numReps < 4) numReps = 4
-            updateRepsInList(exercise, numReps, numReps, numReps)
-            setRepsInView(exerciseSelectView, numReps, numReps, numReps)
+            updateRepsInList(exercise, numReps1, numReps2, numReps3)
+            setRepsInView(exerciseSelectView, numReps1, numReps2, numReps3)
         }
     }
 
@@ -178,7 +207,7 @@ class SelectorActivity : AppCompatActivity() {
             val rowsAdded = db?.Dao()?.updateAll(mExerciseList)
             uiThread {
                 if (rowsAdded.orEmpty().size != mExerciseList.size) {
-                    Log.e(com.epsilon.startbodyweight.data.LTAG, "Failed to add selected exercises to Database.")
+                    Log.e(LTAG, "Failed to add selected exercises to Database.")
                 }
                 if (it.intent.hasExtra("SELECTED_FROM_MAIN_MENU")) {
                     startActivity(Intent(it, MainActivity::class.java))
@@ -189,7 +218,7 @@ class SelectorActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateRepsInList(exercise: MyExercises, reps1: Int, reps2: Int, reps3: Int) {
+    private fun updateRepsInList(exercise: ExerciseEntity, reps1: Int, reps2: Int, reps3: Int) {
         exercise.set1Reps = reps1
         exercise.set2Reps = reps2
         exercise.set3Reps = reps3

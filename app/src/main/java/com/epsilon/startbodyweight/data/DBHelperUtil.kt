@@ -2,12 +2,12 @@ package com.epsilon.startbodyweight.data
 
 import android.content.res.Resources
 
-class HelperUtil {
+class DBHelperUtil {
     companion object {
         fun populateDbTestData(db: RoomDB?, resources: Resources) {
-            val exers = JSONdata.getExerciseList(resources)
+            val exers = ExerData.getExerciseList(resources)
             exers?.
-                    mapIndexed { i, it -> MyExercises( it.name, i, it.progs[0], 0, 5, 6, 2, 0, false, 0) }?.
+                    mapIndexed { i, it -> ExerciseEntity( it.name, i, it.progs[0], 0, 5, 6, 2, 0, false, 0) }?.
                     forEach { db?.Dao()?.updateExercise(it) }
         }
 

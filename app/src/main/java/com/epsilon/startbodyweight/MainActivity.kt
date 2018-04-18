@@ -2,12 +2,11 @@ package com.epsilon.startbodyweight
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.v4.content.ContextCompat.startActivity
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
 import android.widget.Toast
-import com.epsilon.startbodyweight.data.HelperUtil
+import com.epsilon.startbodyweight.data.DBHelperUtil
 import com.epsilon.startbodyweight.data.RoomDB
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
@@ -23,7 +22,7 @@ class MainActivity : AppCompatActivity() {
 
     fun startWorkoutActivity(v: View) {
         doAsync {
-            val isInitialized = HelperUtil.isDbInitialized(RoomDB.get(weakRef.get()))
+            val isInitialized = DBHelperUtil.isDbInitialized(RoomDB.get(weakRef.get()))
             uiThread {
                 if (isInitialized) {
                     Log.i(LTAG, "Our DB is initialized, start workout")
@@ -38,7 +37,7 @@ class MainActivity : AppCompatActivity() {
 
     fun nukeWorkoutData(v: View){
         doAsync {
-            HelperUtil.nukeDatabase(RoomDB.get(weakRef.get()))
+            DBHelperUtil.nukeDatabase(RoomDB.get(weakRef.get()))
 
             uiThread{
                 Log.i(LTAG, "Data in DB deleted")
@@ -53,7 +52,7 @@ class MainActivity : AppCompatActivity() {
         intent.putExtra("SELECTED_FROM_MAIN_MENU", true)
 
         doAsync {
-            val isDbInitialized = HelperUtil.isDbInitialized(RoomDB.get(weakRef.get()))
+            val isDbInitialized = DBHelperUtil.isDbInitialized(RoomDB.get(weakRef.get()))
             uiThread {
                 if (isDbInitialized ) {
                     intent.putExtra("LOAD_FROM_DB", true)

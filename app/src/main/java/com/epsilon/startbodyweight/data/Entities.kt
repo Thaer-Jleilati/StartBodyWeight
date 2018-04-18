@@ -6,7 +6,7 @@ import android.arch.persistence.room.Ignore
 import android.arch.persistence.room.PrimaryKey
 
 @Entity
-data class MyExercises (
+data class ExerciseEntity(
         @PrimaryKey var exerciseName: String = "",
         var exerciseNum: Int = 0,
         var progressionName: String = "",
@@ -19,10 +19,12 @@ data class MyExercises (
         var numAttempts: Int = 0,
 
         // Do not store the following items in our DB
-        //TODO remove next set reps?
+        @Ignore var allProgressions: ArrayList<String>? = ArrayList(),
         @Ignore var nextSet1Reps: Int = 0,
         @Ignore var nextSet2Reps: Int = 0,
         @Ignore var nextSet3Reps: Int = 0,
         @Ignore var nextSetTime: Int = 0,
-        @Ignore var allProgressions: ArrayList<String>? = ArrayList()
+        @Ignore var nextProgressionName: String = "",
+        @Ignore var nextProgressionNumber: Int = 0,
+        @Ignore var isModified: Boolean = false
 )

@@ -1,6 +1,7 @@
 package com.epsilon.startbodyweight
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.os.SystemClock
 import android.support.constraint.ConstraintLayout
@@ -11,15 +12,20 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Button
-import com.epsilon.startbodyweight.data.MyExercises
-import com.epsilon.startbodyweight.data.RoomDB
+import com.epsilon.startbodyweight.data.*
+import com.epsilon.startbodyweight.data.ExerData.Companion.MAX_EXERCISE_REPS
+import com.epsilon.startbodyweight.data.ExerData.Companion.MAX_EXERCISE_TIME
+import com.epsilon.startbodyweight.data.ExerData.Companion.MIN_EXERCISE_REPS
+import com.epsilon.startbodyweight.data.ExerData.Companion.MIN_EXERCISE_TIME
 import kotlinx.android.synthetic.main.activity_workout.*
 import kotlinx.android.synthetic.main.workout_item.view.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
+import kotlin.math.max
+import kotlin.math.min
 
-private class WorkoutItemAdapter(context: Context, exercise: ArrayList<MyExercises>):
-        ArrayAdapter<MyExercises>(context, 0, exercise) {
+private class WorkoutItemAdapter(context: Context, exercise: ArrayList<ExerciseEntity>):
+        ArrayAdapter<ExerciseEntity>(context, 0, exercise) {
 
     override fun getView(position: Int, inputView: View?, parent: ViewGroup): View {
         // Get the data item for this position
@@ -56,7 +62,7 @@ private class WorkoutItemAdapter(context: Context, exercise: ArrayList<MyExercis
 class WorkoutActivity : AppCompatActivity() {
     private val LTAG = WorkoutActivity::class.qualifiedName
     private var mTimeElapsedChron = 0L
-    private val mExerciseList = ArrayList<MyExercises>()
+    private val mExerciseList = ArrayList<ExerciseEntity>()
     private lateinit var mWorkoutItemAdapter: WorkoutItemAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -107,56 +113,90 @@ class WorkoutActivity : AppCompatActivity() {
         }
     }
 
-    fun passExercise(v: View){
+    fun passExerciseView(v: View){
+        val parent = v.parent as ConstraintLayout
+        val position = parent.tag as Int
+
+
+        val textMessage = passExerciseAndGetMessage(position)
+        parent.tv_exer_message.text = textMessage
+    }
+
+    private fun passExerciseAndGetMessage(position: Int): String{
+        val exercise = mWorkoutItemAdapter.getItem(position)
+        var moveToNextExercise = false
+        var returnedMessage: String
+
+        exercise.isModified = true
+
+        if (!exercise.isTimedExercise) {
+            moveToNextExercise = ExerData.incrementExerciseReps(exercise)
+            returnedMessage = "Way to go. Next time you'll do ${exercise.nextSet1Reps} x ${exercise.nextSet2Reps} x ${exercise.nextSet3Reps}"
+        } else {
+            moveToNextExercise = ExerData.incrementExerciseTime(exercise)
+            returnedMessage = "Way to go. Next time you'll do $exercise.nextSetTime seconds"
+        }
+
+        if (moveToNextExercise) {
+            returnedMessage = "Congrats. Moving up!"
+            ExerData.setNextProgression(resources, exercise)
+            // TODO: Support alternate dips / pushups
+        } else {
+            ExerData.stayOnCurrentProgression(exercise)
+        }
+
+        return returnedMessage
+    }
+
+    fun failExerciseView(v: View){
         val parent = v.parent as ConstraintLayout
         val position = parent.tag as Int
         val exercise = mWorkoutItemAdapter.getItem(position)
-        var moveToNextExercise = false
 
-        if (!exercise.isTimedExercise){
-            var reps1 = parent.tv_exer_rep_1.text.toString().toInt()
-            var reps2 = parent.tv_exer_rep_2.text.toString().toInt()
-            var reps3 = parent.tv_exer_rep_3.text.toString().toInt()
-            val minReps = arrayOf(reps1, reps2, reps3).min()
+        exercise.isModified = true
+        exercise.numAttempts++
+        parent.tv_exer_message.text = "Failure is essential. Try again next workout."
 
-            if (reps1 == minReps){
-                reps1++
-                if (reps1 > 8) {
-                    moveToNextExercise = true
-                    reps1 = 4
-                    reps2 = 4
-                    reps3 = 4
-                }
-            } else if (reps2 == minReps) {
-                reps2++
-            } else if (reps3 == minReps) {
-                reps3++
+        if ( exercise.numAttempts >= 2) {
+            exercise.numAttempts = 0
+            parent.tv_exer_message.text = "2nd attempt at exercise. Lowering difficulty."
+
+            if (!exercise.isTimedExercise) {
+                exercise.nextSetTime = max(exercise.setTime - 10, MIN_EXERCISE_TIME)
+            } else {
+                exercise.nextSet1Reps = max(exercise.set1Reps - 2, MIN_EXERCISE_REPS)
+                exercise.nextSet2Reps = max(exercise.set2Reps - 2, MIN_EXERCISE_REPS)
+                exercise.nextSet3Reps = max(exercise.set3Reps - 2, MIN_EXERCISE_REPS)
             }
 
-            exercise.nextSet1Reps = reps1
-            exercise.nextSet2Reps = reps2
-            exercise.nextSet3Reps = reps3
-            parent.tv_exer_message.text = "Way to go. Next time you'll do $reps1 x $reps2 x $reps3"
-        } else {
-            var time = parent.tv_exer_time.text.toString().toInt()
-            time += 5
-            if (time > 60){
-                moveToNextExercise = true
-                time = 30
-            }
-
-            exercise.nextSetTime = time
-            parent.tv_exer_message.text = "Way to go. Next time you'll do $time seconds"
+            // TODO: New progression too hard? Do the previous one up until 12 reps
         }
+    }
 
-        // TODO
-        /*
-        if (moveToNextExercise){
-            parent.tv_exer_message.text = "Congrats. Moving up!"
-            val exerNum = parent.getTag(R.id.EXERCISE_NUM_TAG).toString()
-            val progressionNum = parent.getTag(R.id.PROGRESSION_NUM_TAG) as Int
-            val nextProgression = JSONdata.getNextProgression(resources, exerNum, progressionNum)
-            parent.setTag(R.id.NEXT_PROGRESSION_TAG, nextProgression)
-        }*/
+    fun completeWorkout(v: View){
+        // Update our exercise with our results
+        mExerciseList.forEachIndexed { i, it ->
+            // Automatically pass all untouched exercises
+            if (!it.isModified){
+                passExerciseAndGetMessage(i)
+            }
+
+            it.progressionName = it.nextProgressionName
+            it.progressionNumber = it.nextProgressionNumber
+            it.set1Reps = it.nextSet1Reps
+            it.set2Reps = it.nextSet2Reps
+            it.set3Reps = it.nextSet3Reps
+            it.setTime = it.nextSetTime
+        }
+        val db = RoomDB.get(this)
+        doAsync {
+            val rowsAdded = db?.Dao()?.updateAll(mExerciseList)
+            uiThread {
+                if (rowsAdded.orEmpty().size != mExerciseList.size) {
+                    Log.e(LTAG, "Failed to add updated exercises to Database.")
+                }
+                startActivity(Intent(it, MainActivity::class.java))
+            }
+        }
     }
 }

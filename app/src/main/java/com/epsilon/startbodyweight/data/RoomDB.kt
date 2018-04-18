@@ -9,7 +9,7 @@ import android.content.Context
 import android.util.Log
 import com.epsilon.startbodyweight.SelectorActivity
 
-@Database(entities = [MyExercises::class], version = 5)
+@Database(entities = [ExerciseEntity::class], version = 8)
 abstract class RoomDB : RoomDatabase() {
     val LTAG = SelectorActivity::class.qualifiedName
 
@@ -47,7 +47,7 @@ abstract class RoomDB : RoomDatabase() {
         val MIGRATION_3_4: Migration = object : Migration(3, 4) {
             override fun migrate(database: SupportSQLiteDatabase) {
                 // We cannot drop columns in sqlite... Just destroy and restart.
-                database.execSQL("DELETE FROM MyExercises")
+                database.execSQL("DELETE FROM ExerciseEntity")
             }
         }
     }

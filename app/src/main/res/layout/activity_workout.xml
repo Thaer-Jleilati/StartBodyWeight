@@ -28,6 +28,18 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <Button
+        android:id="@+id/b_complete_workout"
+        android:layout_width="100dp"
+        android:layout_height="40dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:onClick="completeWorkout"
+        android:text="Complete"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/b_chron" />
+
     <Chronometer
         android:id="@+id/cr_chronometer"
         android:layout_width="wrap_content"

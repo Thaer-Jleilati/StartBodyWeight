@@ -8,17 +8,17 @@ import android.arch.persistence.room.Query
 @Dao
 interface Dao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun updateExercise(exercise: MyExercises): Long
+    fun updateExercise(exercise: ExerciseEntity): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun updateAll(exercises: List<MyExercises>): List<Long>
+    fun updateAll(exercises: List<ExerciseEntity>): List<Long>
 
-    @Query("SELECT * from myExercises")
-    fun getAllMyExercises(): List<MyExercises>
+    @Query("SELECT * from ExerciseEntity")
+    fun getAllMyExercises(): List<ExerciseEntity>
 
-    @Query("DELETE FROM myExercises")
+    @Query("DELETE FROM ExerciseEntity")
     fun nukeTable()
 
-    @Query("SELECT count(numAttempts) FROM myExercises")
+    @Query("SELECT count(numAttempts) FROM ExerciseEntity")
     fun numRows() : Int
 }
