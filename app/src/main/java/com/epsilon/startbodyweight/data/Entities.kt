@@ -24,7 +24,9 @@ data class ExerciseEntity(
         @Ignore var nextSet2Reps: Int = 0,
         @Ignore var nextSet3Reps: Int = 0,
         @Ignore var nextSetTime: Int = 0,
+        @Ignore var nextNumAttempts: Int = 0,
         @Ignore var nextProgressionName: String = "",
         @Ignore var nextProgressionNumber: Int = 0,
-        @Ignore var isModified: Boolean = false
+        @Ignore var isModified: Boolean = false,
+        @Ignore var exerMessage: String = ""
 )

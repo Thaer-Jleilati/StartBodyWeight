@@ -12,17 +12,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Button
-import com.epsilon.startbodyweight.data.*
-import com.epsilon.startbodyweight.data.ExerData.Companion.MAX_EXERCISE_REPS
-import com.epsilon.startbodyweight.data.ExerData.Companion.MAX_EXERCISE_TIME
-import com.epsilon.startbodyweight.data.ExerData.Companion.MIN_EXERCISE_REPS
-import com.epsilon.startbodyweight.data.ExerData.Companion.MIN_EXERCISE_TIME
+import com.epsilon.startbodyweight.data.ExerData
+import com.epsilon.startbodyweight.data.ExerciseEntity
+import com.epsilon.startbodyweight.data.RoomDB
 import kotlinx.android.synthetic.main.activity_workout.*
 import kotlinx.android.synthetic.main.workout_item.view.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
-import kotlin.math.max
-import kotlin.math.min
 
 private class WorkoutItemAdapter(context: Context, exercise: ArrayList<ExerciseEntity>):
         ArrayAdapter<ExerciseEntity>(context, 0, exercise) {
@@ -34,8 +30,8 @@ private class WorkoutItemAdapter(context: Context, exercise: ArrayList<ExerciseE
         val workoutItemView = inputView ?: LayoutInflater.from(context).inflate(R.layout.workout_item, parent, false)
         workoutItemView.tag = position
 
-        // Lookup view for data population
         workoutItemView.tv_exer_name.text = exercise.progressionName
+        workoutItemView.tv_exer_message.text = exercise.exerMessage
 
         if (!exercise.isTimedExercise) {
             // Not timed exercise: Hide time, set reps
@@ -54,6 +50,7 @@ private class WorkoutItemAdapter(context: Context, exercise: ArrayList<ExerciseE
             workoutItemView.tv_exer_time.visibility = View.VISIBLE
             workoutItemView.tv_exer_time.text = Integer.toString(exercise.setTime)
         }
+
         // Return the completed view to render on screen
         return workoutItemView
     }
@@ -116,36 +113,32 @@ class WorkoutActivity : AppCompatActivity() {
     fun passExerciseView(v: View){
         val parent = v.parent as ConstraintLayout
         val position = parent.tag as Int
+        val exercise = mWorkoutItemAdapter.getItem(position)
 
-
-        val textMessage = passExerciseAndGetMessage(position)
-        parent.tv_exer_message.text = textMessage
+        passExerciseAndSetMessage(position)
+        parent.tv_exer_message.text = exercise.exerMessage
     }
 
-    private fun passExerciseAndGetMessage(position: Int): String{
+    private fun passExerciseAndSetMessage(position: Int){
         val exercise = mWorkoutItemAdapter.getItem(position)
-        var moveToNextExercise = false
-        var returnedMessage: String
-
         exercise.isModified = true
 
-        if (!exercise.isTimedExercise) {
-            moveToNextExercise = ExerData.incrementExerciseReps(exercise)
-            returnedMessage = "Way to go. Next time you'll do ${exercise.nextSet1Reps} x ${exercise.nextSet2Reps} x ${exercise.nextSet3Reps}"
-        } else {
-            moveToNextExercise = ExerData.incrementExerciseTime(exercise)
-            returnedMessage = "Way to go. Next time you'll do $exercise.nextSetTime seconds"
-        }
+        // Since we passed, reset our number of attempts
+        exercise.nextNumAttempts = 0
 
+        var moveToNextExercise = ExerData.incrementExercise(exercise)
         if (moveToNextExercise) {
-            returnedMessage = "Congrats. Moving up!"
+            exercise.exerMessage = "Congrats. Moving up!"
             ExerData.setNextProgression(resources, exercise)
             // TODO: Support alternate dips / pushups
         } else {
             ExerData.stayOnCurrentProgression(exercise)
+            exercise.exerMessage = if (exercise.isTimedExercise) {
+                "Way to go. Next time you'll do ${exercise.nextSetTime} seconds"
+            } else {
+                "Way to go. Next time you'll do ${exercise.nextSet1Reps} x ${exercise.nextSet2Reps} x ${exercise.nextSet3Reps}"
+            }
         }
-
-        return returnedMessage
     }
 
     fun failExerciseView(v: View){
@@ -154,23 +147,22 @@ class WorkoutActivity : AppCompatActivity() {
         val exercise = mWorkoutItemAdapter.getItem(position)
 
         exercise.isModified = true
-        exercise.numAttempts++
-        parent.tv_exer_message.text = "Failure is essential. Try again next workout."
+        exercise.nextNumAttempts = exercise.numAttempts + 1
+        exercise.exerMessage = "Failure is essential. Try again next workout."
 
-        if ( exercise.numAttempts >= 2) {
-            exercise.numAttempts = 0
-            parent.tv_exer_message.text = "2nd attempt at exercise. Lowering difficulty."
+        if ( exercise.nextNumAttempts >= 2) {
+            ExerData.decrementExercise(exercise)
 
-            if (!exercise.isTimedExercise) {
-                exercise.nextSetTime = max(exercise.setTime - 10, MIN_EXERCISE_TIME)
-            } else {
-                exercise.nextSet1Reps = max(exercise.set1Reps - 2, MIN_EXERCISE_REPS)
-                exercise.nextSet2Reps = max(exercise.set2Reps - 2, MIN_EXERCISE_REPS)
-                exercise.nextSet3Reps = max(exercise.set3Reps - 2, MIN_EXERCISE_REPS)
+            exercise.nextNumAttempts = 0
+            exercise.exerMessage = if (exercise.isTimedExercise) {
+                "2nd attempt at exercise. Lowering difficulty to ${exercise.nextSetTime} seconds"
+            }  else {
+                "2nd attempt at exercise. Lowering difficulty to ${exercise.nextSet1Reps} x ${exercise.nextSet2Reps} x ${exercise.nextSet3Reps}"
             }
-
             // TODO: New progression too hard? Do the previous one up until 12 reps
         }
+
+        parent.tv_exer_message.text = exercise.exerMessage
     }
 
     fun completeWorkout(v: View){
@@ -178,7 +170,7 @@ class WorkoutActivity : AppCompatActivity() {
         mExerciseList.forEachIndexed { i, it ->
             // Automatically pass all untouched exercises
             if (!it.isModified){
-                passExerciseAndGetMessage(i)
+                passExerciseAndSetMessage(i)
             }
 
             it.progressionName = it.nextProgressionName
@@ -187,6 +179,7 @@ class WorkoutActivity : AppCompatActivity() {
             it.set2Reps = it.nextSet2Reps
             it.set3Reps = it.nextSet3Reps
             it.setTime = it.nextSetTime
+            it.numAttempts = it.nextNumAttempts
         }
         val db = RoomDB.get(this)
         doAsync {

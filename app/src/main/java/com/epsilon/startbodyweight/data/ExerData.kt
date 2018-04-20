@@ -65,7 +65,7 @@ class ExerData {
                 ExerciseEntity(it.name, i, "", 0,
                         MIN_EXERCISE_REPS, MIN_EXERCISE_REPS, MIN_EXERCISE_REPS, MIN_EXERCISE_TIME,
                         isTimedExercise(it.name),0, it.progs,
-                        0, 0, 0, 0,
+                        0, 0, 0, 0, 0,
                         "", 0, false)
             }
         }
@@ -135,7 +135,7 @@ class ExerData {
         }
 
 
-        fun incrementExerciseReps(exercise: ExerciseEntity): Boolean {
+        private fun incrementExerciseReps(exercise: ExerciseEntity): Boolean {
             var moveToNextExercise = false
 
             val (nextSet1Reps, nextSet2Reps, nextSet3Reps) =
@@ -155,14 +155,41 @@ class ExerData {
             return moveToNextExercise
         }
 
-        fun incrementExerciseTime(exercise: ExerciseEntity): Boolean {
+        private fun incrementExerciseTime(exercise: ExerciseEntity): Boolean {
             var moveToNextExercise = false
+
             exercise.nextSetTime = exercise.setTime + 5
             if (exercise.nextSetTime > MAX_EXERCISE_TIME) {
                 moveToNextExercise = true
                 exercise.nextSetTime = MIN_EXERCISE_TIME
             }
             return moveToNextExercise
+        }
+
+        fun incrementExercise(exercise: ExerciseEntity): Boolean {
+            return if (exercise.isTimedExercise) {
+                incrementExerciseTime(exercise)
+            } else {
+                incrementExerciseReps(exercise)
+            }
+        }
+
+        private fun decrementExerciseReps(exercise: ExerciseEntity) {
+            exercise.nextSet1Reps = max(exercise.set1Reps - 1, MIN_EXERCISE_REPS)
+            exercise.nextSet2Reps = max(exercise.set2Reps - 1, MIN_EXERCISE_REPS)
+            exercise.nextSet3Reps = max(exercise.set3Reps - 1, MIN_EXERCISE_REPS)
+        }
+
+        private fun decrementExerciseTime(exercise: ExerciseEntity) {
+            exercise.nextSetTime = max(exercise.setTime - 10, MIN_EXERCISE_TIME)
+        }
+
+        fun decrementExercise(exercise: ExerciseEntity) {
+            if (exercise.isTimedExercise) {
+                decrementExerciseTime(exercise)
+            } else {
+                decrementExerciseReps(exercise)
+            }
         }
     }
 }
