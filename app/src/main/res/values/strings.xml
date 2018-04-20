@@ -5,4 +5,6 @@
     <string name="b_start">Start</string>
     <string name="b_pause">Pause</string>
     <string name="b_stop">Stop</string>
+
+    <string name="pref_include_dips_key" translatable="false">include_dips</string>
 </resources>

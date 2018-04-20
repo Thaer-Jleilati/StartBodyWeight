@@ -16,6 +16,9 @@ interface Dao {
     @Query("SELECT * from ExerciseEntity")
     fun getAllMyExercises(): List<ExerciseEntity>
 
+    @Query("SELECT * from ExerciseEntity WHERE exerciseName != 'Dips'")
+    fun getAllMyExercisesExceptDips(): List<ExerciseEntity>
+
     @Query("DELETE FROM ExerciseEntity")
     fun nukeTable()
 

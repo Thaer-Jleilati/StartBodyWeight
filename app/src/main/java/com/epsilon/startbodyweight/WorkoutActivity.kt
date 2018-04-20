@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.SystemClock
+import android.preference.PreferenceManager
 import android.support.constraint.ConstraintLayout
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
@@ -61,13 +62,22 @@ class WorkoutActivity : AppCompatActivity() {
     private var mTimeElapsedChron = 0L
     private val mExerciseList = ArrayList<ExerciseEntity>()
     private lateinit var mWorkoutItemAdapter: WorkoutItemAdapter
+    private var mIncludeDips: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_workout)
 
+        setupPrefs()
         setupChron()
         setupAdapter()
+    }
+
+    private fun setupPrefs() {
+        val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this)
+        mIncludeDips = sharedPrefs.getBoolean(
+                resources.getString(R.string.pref_include_dips_key),
+                resources.getBoolean(R.bool.pref_include_dips_default))
     }
 
     private fun setupAdapter() {
@@ -97,7 +107,11 @@ class WorkoutActivity : AppCompatActivity() {
     private fun populateAdapterWithExercisesFromDB(workoutItemAdapter: WorkoutItemAdapter) {
         val db = RoomDB.get(this)
         doAsync {
-            var returnedExerciseList = db?.Dao()?.getAllMyExercises()
+            val returnedExerciseList = if (mIncludeDips) {
+                db?.Dao()?.getAllMyExercises()
+            } else {
+                db?.Dao()?.getAllMyExercisesExceptDips()
+            }
             uiThread {
                 if (returnedExerciseList == null || returnedExerciseList.isEmpty()) {
                     Log.e(LTAG, "No workout data found in DB when entering WorkoutActivity.")
@@ -107,6 +121,7 @@ class WorkoutActivity : AppCompatActivity() {
                     workoutItemAdapter.notifyDataSetChanged()
                 }
             }
+
         }
     }
 
@@ -126,7 +141,7 @@ class WorkoutActivity : AppCompatActivity() {
         // Since we passed, reset our number of attempts
         exercise.nextNumAttempts = 0
 
-        var moveToNextExercise = ExerData.incrementExercise(exercise)
+        val moveToNextExercise = ExerData.incrementExercise(exercise)
         if (moveToNextExercise) {
             exercise.exerMessage = "Congrats. Moving up!"
             ExerData.setNextProgression(resources, exercise)
