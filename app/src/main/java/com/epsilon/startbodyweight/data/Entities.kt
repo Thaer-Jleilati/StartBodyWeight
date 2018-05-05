@@ -7,8 +7,8 @@ import android.arch.persistence.room.PrimaryKey
 
 @Entity
 data class ExerciseEntity(
-        @PrimaryKey var exerciseName: String = "",
-        var exerciseNum: Int = 0,
+        var exerciseName: String = "",
+        @PrimaryKey var exerciseNum: Int = 0,
         var progressionName: String = "",
         var progressionNumber: Int = 0,
         var set1Reps: Int = 0,

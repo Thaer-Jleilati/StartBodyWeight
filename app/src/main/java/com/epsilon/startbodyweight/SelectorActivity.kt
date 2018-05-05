@@ -13,12 +13,12 @@ import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
 import android.widget.LinearLayout
 import android.widget.Spinner
-import com.epsilon.startbodyweight.data.ExerciseEntity
 import com.epsilon.startbodyweight.data.ExerData
 import com.epsilon.startbodyweight.data.ExerData.Companion.MAX_EXERCISE_REPS
 import com.epsilon.startbodyweight.data.ExerData.Companion.MAX_EXERCISE_TIME
 import com.epsilon.startbodyweight.data.ExerData.Companion.MIN_EXERCISE_REPS
 import com.epsilon.startbodyweight.data.ExerData.Companion.MIN_EXERCISE_TIME
+import com.epsilon.startbodyweight.data.ExerciseEntity
 import com.epsilon.startbodyweight.data.RoomDB
 import kotlinx.android.synthetic.main.activity_selector.*
 import kotlinx.android.synthetic.main.exercise_select.view.*
@@ -116,8 +116,8 @@ class SelectorActivity : AppCompatActivity() {
                 // DB load was successful, just add our DB exercises to our adapter directly
                 if (loadFromDB && !loadDBFail) {
                     // Load our progression list for each exercise from the JSON data and add it to our exercise data
-                    myDBExercises?.forEachIndexed {
-                        i, it -> it.allProgressions =  completeExerciseList.getOrNull(i)?.progs
+                    myDBExercises?.forEach {
+                        it.allProgressions = completeExerciseList.getOrNull(it.exerciseNum)?.progs
                     }
                     mExerciseSelectAdapter.addAll(myDBExercises)
                 } else {

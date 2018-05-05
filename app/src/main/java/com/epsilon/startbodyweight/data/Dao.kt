@@ -13,10 +13,10 @@ interface Dao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun updateAll(exercises: List<ExerciseEntity>): List<Long>
 
-    @Query("SELECT * from ExerciseEntity")
+    @Query("SELECT * from ExerciseEntity ORDER BY exerciseNum")
     fun getAllMyExercises(): List<ExerciseEntity>
 
-    @Query("SELECT * from ExerciseEntity WHERE exerciseName != 'Dips'")
+    @Query("SELECT * from ExerciseEntity WHERE exerciseName != 'Dips' ORDER BY exerciseNum")
     fun getAllMyExercisesExceptDips(): List<ExerciseEntity>
 
     @Query("DELETE FROM ExerciseEntity")

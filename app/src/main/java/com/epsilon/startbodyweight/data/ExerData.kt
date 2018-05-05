@@ -2,10 +2,11 @@ package com.epsilon.startbodyweight.data
 
 import android.content.res.Resources
 import android.util.Log
+import com.epsilon.startbodyweight.R
 import com.google.gson.Gson
 import kotlin.math.max
 
-data class Exercise(val name: String, val progs: ArrayList<String>)
+data class Exercise(val name: String, val exerciseNum: Int, val progs: ArrayList<String>)
 data class Exercises(val exers: List<Exercise>)
 
 val LTAG = ExerData::class.qualifiedName
@@ -55,8 +56,8 @@ class ExerData {
         }
 
         fun convertToExerciseEntityList(jsonExerciseList: List<Exercise>?): List<ExerciseEntity>{
-            return jsonExerciseList.orEmpty().mapIndexed { i, it ->
-                ExerciseEntity(it.name, i, "", 0,
+            return jsonExerciseList.orEmpty().map {
+                ExerciseEntity(it.name, it.exerciseNum, "", 0,
                         MIN_EXERCISE_REPS, MIN_EXERCISE_REPS, MIN_EXERCISE_REPS, MIN_EXERCISE_TIME,
                         isTimedExercise(it.name),0, it.progs,
                         0, 0, 0, 0, 0,
