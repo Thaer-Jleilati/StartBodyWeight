@@ -1,5 +1,6 @@
 package com.epsilon.startbodyweight
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -13,6 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.Toast
 import com.epsilon.startbodyweight.data.ExerData
 import com.epsilon.startbodyweight.data.ExerciseEntity
 import com.epsilon.startbodyweight.data.RoomDB
@@ -116,6 +118,17 @@ class WorkoutActivity : AppCompatActivity() {
                 if (returnedExerciseList == null || returnedExerciseList.isEmpty()) {
                     Log.e(LTAG, "No workout data found in DB when entering WorkoutActivity.")
                 } else {
+                    // Initialize Entity's "next" values
+                    returnedExerciseList.forEach {
+                        it.nextSet1Reps = it.set1Reps
+                        it.nextSet2Reps = it.set2Reps
+                        it.nextSet3Reps = it.set3Reps
+                        it.nextSetTime = it.setTime
+                        it.nextProgressionName = it.progressionName
+                        it.nextProgressionNumber = it.progressionNumber
+                        it.nextNumAttempts = it.numAttempts
+                    }
+
                     // Populate our workout adapter with our exercise list, which will inflate all the views.
                     workoutItemAdapter.addAll(returnedExerciseList)
                     workoutItemAdapter.notifyDataSetChanged()
@@ -147,7 +160,6 @@ class WorkoutActivity : AppCompatActivity() {
             ExerData.setNextProgression(resources, exercise)
             // TODO: Support alternate dips / pushups
         } else {
-            ExerData.stayOnCurrentProgression(exercise)
             exercise.exerMessage = if (exercise.isTimedExercise) {
                 "Way to go. Next time you'll do ${exercise.nextSetTime} seconds"
             } else {
@@ -178,6 +190,13 @@ class WorkoutActivity : AppCompatActivity() {
         }
 
         parent.tv_exer_message.text = exercise.exerMessage
+    }
+
+    @SuppressLint("NewApi")
+    fun completeSet(v: View) {
+        Toast.makeText(this, "Completed set", Toast.LENGTH_SHORT).show()
+
+
     }
 
     fun completeWorkout(v: View){

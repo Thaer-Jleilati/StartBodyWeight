@@ -2,7 +2,6 @@ package com.epsilon.startbodyweight.data
 
 import android.content.res.Resources
 import android.util.Log
-import com.epsilon.startbodyweight.R
 import com.google.gson.Gson
 import kotlin.math.max
 
@@ -53,11 +52,6 @@ class ExerData {
                 exercise.nextProgressionNumber = exercise.progressionNumber
                 exercise.nextProgressionName = exercise.progressionName
             }
-        }
-
-        fun stayOnCurrentProgression(exercise: ExerciseEntity){
-            exercise.nextProgressionNumber = exercise.progressionNumber
-            exercise.nextProgressionName = exercise.progressionName
         }
 
         fun convertToExerciseEntityList(jsonExerciseList: List<Exercise>?): List<ExerciseEntity>{
