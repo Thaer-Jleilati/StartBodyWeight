@@ -40,6 +40,16 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
+
+        <receiver
+            android:name=".notif.NotificationReceiver"
+            android:exported="false">
+            <intent-filter>
+                <!-- Note: we cannot use @string resources, so keep in mind if the string names change -->
+                <action android:name="com.epsilon.startbodyweight.COMPLETE_SET" />
+                <action android:name="com.epsilon.startbodyweight.DISMISS" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

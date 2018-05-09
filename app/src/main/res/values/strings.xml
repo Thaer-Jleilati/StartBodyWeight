@@ -7,4 +7,7 @@
     <string name="b_stop">Stop</string>
 
     <string name="pref_include_dips_key" translatable="false">include_dips</string>
+
+    <string name="receiver_dismiss">com.epsilon.startbodyweight.DISMISS</string>
+    <string name="receiver_complete_set">com.epsilon.startbodyweight.COMPLETE_SET</string>
 </resources>
