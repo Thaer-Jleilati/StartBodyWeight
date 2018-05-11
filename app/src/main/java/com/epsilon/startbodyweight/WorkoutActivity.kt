@@ -1,8 +1,8 @@
 package com.epsilon.startbodyweight
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.os.SystemClock
 import android.preference.PreferenceManager
@@ -14,10 +14,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Button
-import android.widget.Toast
 import com.epsilon.startbodyweight.data.ExerData
 import com.epsilon.startbodyweight.data.ExerciseEntity
 import com.epsilon.startbodyweight.data.RoomDB
+import com.epsilon.startbodyweight.notif.NotificationUtil
 import kotlinx.android.synthetic.main.activity_workout.*
 import kotlinx.android.synthetic.main.workout_item.view.*
 import org.jetbrains.anko.doAsync
@@ -25,6 +25,16 @@ import org.jetbrains.anko.uiThread
 
 private class WorkoutItemAdapter(context: Context, exercise: ArrayList<ExerciseEntity>):
         ArrayAdapter<ExerciseEntity>(context, 0, exercise) {
+
+    private fun styleCompletedSets(workoutItemView: View, exercise: ExerciseEntity) {
+        if (exercise.isTimedExercise) {
+            workoutItemView.tv_exer_time.setBackgroundColor(if (exercise.isSetTimeComplete) Color.GREEN else Color.TRANSPARENT)
+        } else {
+            workoutItemView.tv_exer_rep_1.setBackgroundColor(if (exercise.isSet1Complete) Color.GREEN else Color.TRANSPARENT)
+            workoutItemView.tv_exer_rep_2.setBackgroundColor(if (exercise.isSet2Complete) Color.GREEN else Color.TRANSPARENT)
+            workoutItemView.tv_exer_rep_3.setBackgroundColor(if (exercise.isSet3Complete) Color.GREEN else Color.TRANSPARENT)
+        }
+    }
 
     override fun getView(position: Int, inputView: View?, parent: ViewGroup): View {
         // Get the data item for this position
@@ -53,6 +63,7 @@ private class WorkoutItemAdapter(context: Context, exercise: ArrayList<ExerciseE
             workoutItemView.tv_exer_time.visibility = View.VISIBLE
             workoutItemView.tv_exer_time.text = Integer.toString(exercise.setTime)
         }
+        styleCompletedSets(workoutItemView, exercise)
 
         // Return the completed view to render on screen
         return workoutItemView
@@ -92,7 +103,7 @@ class WorkoutActivity : AppCompatActivity() {
         cr_chronometer.stop() // Ensure it is stopped at the beginning
     }
 
-    fun chronoButtonClick(v: View) {
+    fun chronoButtonStartPause(v: View) {
         val button = v as Button
         if (button.text.toString() == getString(R.string.b_start)) {
             cr_chronometer.base = SystemClock.elapsedRealtime() - mTimeElapsedChron
@@ -103,6 +114,11 @@ class WorkoutActivity : AppCompatActivity() {
             cr_chronometer.stop()
             button.text = getString(R.string.b_start)
         }
+    }
+
+    fun chronoButtonRestart(v: View) {
+        cr_chronometer.base = SystemClock.elapsedRealtime()
+        mTimeElapsedChron = 0
     }
 
 
@@ -192,11 +208,41 @@ class WorkoutActivity : AppCompatActivity() {
         parent.tv_exer_message.text = exercise.exerMessage
     }
 
-    @SuppressLint("NewApi")
     fun completeSet(v: View) {
-        Toast.makeText(this, "Completed set", Toast.LENGTH_SHORT).show()
+        val position = v.tag as Int
+        val exercise = mWorkoutItemAdapter.getItem(position)
 
+        val waitTime = 150
 
+        if (!exercise.isTimedExercise) {
+            when {
+                exercise.isSet2Complete -> {
+                    exercise.isSet3Complete = true
+                    v.tv_exer_rep_3.setBackgroundColor(Color.GREEN)
+                    passExerciseView(v.tv_exer_rep_3)
+                    NotificationUtil.cancelPendingNotification(this)
+                }
+                exercise.isSet1Complete -> {
+                    exercise.isSet2Complete = true
+                    v.tv_exer_rep_2.setBackgroundColor(Color.GREEN)
+                    exercise.exerMessage = "Congratulations. Please rest for $waitTime seconds."
+                    v.tv_exer_message.text = exercise.exerMessage
+                    NotificationUtil.scheduleNotification(this, "Ready to go", "Perform your next set now.", waitTime)
+                }
+                else -> {
+                    exercise.isSet1Complete = true
+                    v.tv_exer_rep_1.setBackgroundColor(Color.GREEN)
+                    exercise.exerMessage = "Congratulations. Please rest for $waitTime seconds."
+                    v.tv_exer_message.text = exercise.exerMessage
+                    NotificationUtil.scheduleNotification(this, "Ready to go", "Perform your next set now.", waitTime)
+                }
+            }
+        } else {
+            exercise.isSetTimeComplete = true
+            v.tv_exer_time.setBackgroundColor(Color.GREEN)
+            passExerciseView(v.tv_exer_rep_3)
+            NotificationUtil.cancelPendingNotification(this)
+        }
     }
 
     fun completeWorkout(v: View){

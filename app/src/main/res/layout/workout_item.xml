@@ -11,6 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
+        android:text="Herculean thrust"
         android:textSize="24sp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -21,9 +22,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
-        android:text=""
+        android:text="0"
         android:textSize="24sp"
-        app:layout_constraintBaseline_toBaselineOf="@id/btn_exer_pass"
+        app:layout_constraintBaseline_toBaselineOf="@id/btn_exer_fail"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_exer_name" />
 
@@ -33,9 +34,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
-        android:text=""
+        android:text="0"
         android:textSize="24sp"
-        app:layout_constraintBaseline_toBaselineOf="@id/btn_exer_pass"
+        app:layout_constraintBaseline_toBaselineOf="@id/btn_exer_fail"
         app:layout_constraintStart_toEndOf="@id/tv_exer_rep_1"
         app:layout_constraintTop_toBottomOf="@+id/tv_exer_name" />
 
@@ -45,9 +46,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
-        android:text=""
+        android:text="0"
         android:textSize="24sp"
-        app:layout_constraintBaseline_toBaselineOf="@id/btn_exer_pass"
+        app:layout_constraintBaseline_toBaselineOf="@id/btn_exer_fail"
         app:layout_constraintStart_toEndOf="@id/tv_exer_rep_2"
         app:layout_constraintTop_toBottomOf="@+id/tv_exer_name" />
 
@@ -59,11 +60,11 @@
         android:layout_marginTop="8dp"
         android:text=""
         android:textSize="24sp"
-        app:layout_constraintBaseline_toBaselineOf="@id/btn_exer_pass"
+        app:layout_constraintBaseline_toBaselineOf="@id/btn_exer_fail"
         app:layout_constraintStart_toEndOf="@id/tv_exer_rep_1"
         app:layout_constraintTop_toBottomOf="@+id/tv_exer_name" />
 
-    <Button
+    <!--Button
         android:id="@+id/btn_exer_pass"
         style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="wrap_content"
@@ -76,7 +77,7 @@
         android:text="Pass"
         android:textSize="20sp"
         app:layout_constraintEnd_toStartOf="@id/btn_exer_fail"
-        app:layout_constraintTop_toBottomOf="@id/tv_exer_name" />
+        app:layout_constraintTop_toBottomOf="@id/tv_exer_name" /-->
 
     <Button
         android:id="@+id/btn_exer_fail"
@@ -100,7 +101,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="16dp"
-        android:text=""
+        android:text="Soon you will have glutes of steel."
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btn_exer_fail" />
 

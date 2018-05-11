@@ -46,8 +46,9 @@
             android:exported="false">
             <intent-filter>
                 <!-- Note: we cannot use @string resources, so keep in mind if the string names change -->
-                <action android:name="com.epsilon.startbodyweight.COMPLETE_SET" />
-                <action android:name="com.epsilon.startbodyweight.DISMISS" />
+                <action android:name="com.epsilon.startbodyweight.ACTION_COMPLETE_SET" />
+                <action android:name="com.epsilon.startbodyweight.ACTION_DISMISS" />
+                <action android:name="com.epsilon.startbodyweight.ACTION_DISPLAY_NOTIF" />
             </intent-filter>
         </receiver>
     </application>

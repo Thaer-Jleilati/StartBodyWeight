@@ -28,5 +28,9 @@ data class ExerciseEntity(
         @Ignore var nextProgressionName: String = "",
         @Ignore var nextProgressionNumber: Int = 0,
         @Ignore var isModified: Boolean = false,
-        @Ignore var exerMessage: String = ""
+        @Ignore var exerMessage: String = "",
+        @Ignore var isSet1Complete: Boolean = false,
+        @Ignore var isSet2Complete: Boolean = false,
+        @Ignore var isSet3Complete: Boolean = false,
+        @Ignore var isSetTimeComplete: Boolean = false
 )

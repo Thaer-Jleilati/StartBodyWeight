@@ -81,6 +81,7 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("NewApi")
     fun testMisc(v: View) {
-        NotificationUtil.createNotification(this, "MY NOTIF LOL", "YOU SUCK!!!")
+        NotificationUtil.scheduleNotification(this, "MY NOTIF LOL", "YOU SUCK!!!")
+        NotificationUtil.scheduleNotification(this, "MY NOTIF LOL", "YOU SUCK!!!", 30)
     }
 }

@@ -1,13 +1,14 @@
 <resources>
     <string name="app_name">StartBodyWeight</string>
-    <string name="action_settings">Settings</string>
+    <string name="menu_settings">Settings</string>
 
-    <string name="b_start">Start</string>
-    <string name="b_pause">Pause</string>
-    <string name="b_stop">Stop</string>
+    <string name="b_start">▶</string>
+    <string name="b_pause">⏸️</string>
+    <string name="b_restart">⟳</string>
 
     <string name="pref_include_dips_key" translatable="false">include_dips</string>
 
-    <string name="receiver_dismiss">com.epsilon.startbodyweight.DISMISS</string>
-    <string name="receiver_complete_set">com.epsilon.startbodyweight.COMPLETE_SET</string>
+    <string name="action_dismiss">com.epsilon.startbodyweight.ACTION_DISMISS</string>
+    <string name="action_complete_set">com.epsilon.startbodyweight.ACTION_COMPLETE_SET</string>
+    <string name="action_display_notif">com.epsilon.startbodyweight.ACTION_DISPLAY_NOTIF</string>
 </resources>
