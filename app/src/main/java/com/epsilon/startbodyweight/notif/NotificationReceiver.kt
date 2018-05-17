@@ -13,14 +13,18 @@ class NotificationReceiver : BroadcastReceiver() {
         val action = intent?.action
         when {
             action.equals(c?.resources?.getString(R.string.action_complete_set)) -> {
-                Toast.makeText(c, "YES CALLED", Toast.LENGTH_SHORT).show()
+                Toast.makeText(c, "Set completed. [TODO]", Toast.LENGTH_SHORT).show()
                 NotificationUtil.clearAllNotifications(c)
             }
-            action.equals(c?.resources?.getString(R.string.action_dismiss)) -> NotificationUtil.clearAllNotifications(c)
+            action.equals(c?.resources?.getString(R.string.action_dismiss)) -> {
+                NotificationUtil.clearAllNotifications(c)
+            }
             action.equals(c?.resources?.getString(R.string.action_display_notif)) -> {
                 val notificationManager = c?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                val notification = intent?.getParcelableExtra(NOTIFICATION_TAG) as Notification
-                val id = intent.getIntExtra(NOTIFICATION_ID_TAG, 0)
+                val notification = intent?.getParcelableExtra(c.resources.getString(R.string.NOTIFICATION_TAG)) as Notification
+                val id = intent.getIntExtra(c.resources.getString(R.string.NOTIFICATION_ID_TAG), 0)
+
+                // Displays the notification that was attached in our pending intent
                 notificationManager.notify(id, notification)
             }
         }

@@ -11,4 +11,7 @@
     <string name="action_dismiss">com.epsilon.startbodyweight.ACTION_DISMISS</string>
     <string name="action_complete_set">com.epsilon.startbodyweight.ACTION_COMPLETE_SET</string>
     <string name="action_display_notif">com.epsilon.startbodyweight.ACTION_DISPLAY_NOTIF</string>
+
+    <string name="NOTIFICATION_ID_TAG">com.epsilon.startbodyweight.notifchannel.notifID</string>
+    <string name="NOTIFICATION_TAG">com.epsilon.startbodyweight.notifchannel.notif</string>
 </resources>

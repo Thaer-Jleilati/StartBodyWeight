@@ -19,8 +19,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <!-- Keep only a single workout activity, and bring the existing instance to the front of the stack if its opened from a notification -->
         <activity
             android:name=".WorkoutActivity"
+            android:launchMode="singleTask"
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -40,16 +42,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
-
+        <!-- Note: we do not need any intent filters because we call the class explicitly -->
         <receiver
             android:name=".notif.NotificationReceiver"
             android:exported="false">
-            <intent-filter>
-                <!-- Note: we cannot use @string resources, so keep in mind if the string names change -->
-                <action android:name="com.epsilon.startbodyweight.ACTION_COMPLETE_SET" />
-                <action android:name="com.epsilon.startbodyweight.ACTION_DISMISS" />
-                <action android:name="com.epsilon.startbodyweight.ACTION_DISPLAY_NOTIF" />
-            </intent-filter>
         </receiver>
     </application>
 
