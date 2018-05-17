@@ -116,11 +116,32 @@ class WorkoutActivity : AppCompatActivity() {
         }
     }
 
-    fun chronoButtonRestart(v: View) {
+    fun chronoButtonResetTime(v: View?) {
         cr_chronometer.base = SystemClock.elapsedRealtime()
         mTimeElapsedChron = 0
     }
 
+    fun chronoButtonRestart() {
+        chronoButtonResetTime(null)
+        cr_chronometer.start()
+    }
+
+    private fun initializeExerciseEntity(exercise: ExerciseEntity) {
+        exercise.nextSet1Reps = exercise.set1Reps
+        exercise.nextSet2Reps = exercise.set2Reps
+        exercise.nextSet3Reps = exercise.set3Reps
+        exercise.nextSetTime = exercise.setTime
+        exercise.nextProgressionName = exercise.progressionName
+        exercise.nextProgressionNumber = exercise.progressionNumber
+        exercise.nextNumAttempts = exercise.numAttempts
+        exercise.allProgressions = ArrayList()
+        exercise.isModified = false
+        exercise.exerMessage = ""
+        exercise.isSet1Complete = false
+        exercise.isSet2Complete = false
+        exercise.isSet3Complete = false
+        exercise.isSetTimeComplete = false
+    }
 
     private fun populateAdapterWithExercisesFromDB(workoutItemAdapter: WorkoutItemAdapter) {
         val db = RoomDB.get(this)
@@ -136,13 +157,7 @@ class WorkoutActivity : AppCompatActivity() {
                 } else {
                     // Initialize Entity's "next" values
                     returnedExerciseList.forEach {
-                        it.nextSet1Reps = it.set1Reps
-                        it.nextSet2Reps = it.set2Reps
-                        it.nextSet3Reps = it.set3Reps
-                        it.nextSetTime = it.setTime
-                        it.nextProgressionName = it.progressionName
-                        it.nextProgressionNumber = it.progressionNumber
-                        it.nextNumAttempts = it.numAttempts
+                        initializeExerciseEntity(it)
                     }
 
                     // Populate our workout adapter with our exercise list, which will inflate all the views.
@@ -154,17 +169,7 @@ class WorkoutActivity : AppCompatActivity() {
         }
     }
 
-    fun passExerciseView(v: View){
-        val parent = v.parent as ConstraintLayout
-        val position = parent.tag as Int
-        val exercise = mWorkoutItemAdapter.getItem(position)
-
-        passExerciseAndSetMessage(position)
-        parent.tv_exer_message.text = exercise.exerMessage
-    }
-
-    private fun passExerciseAndSetMessage(position: Int){
-        val exercise = mWorkoutItemAdapter.getItem(position)
+    fun passExercise(exercise: ExerciseEntity) {
         exercise.isModified = true
 
         // Since we passed, reset our number of attempts
@@ -212,36 +217,73 @@ class WorkoutActivity : AppCompatActivity() {
         val position = v.tag as Int
         val exercise = mWorkoutItemAdapter.getItem(position)
 
-        val waitTime = 150
+        val waitTime = resources.getInteger(R.integer.wait_time_in_seconds)
+        NotificationUtil.clearAllNotifications(this)
 
         if (!exercise.isTimedExercise) {
             when {
-                exercise.isSet2Complete -> {
+                !exercise.isSet1Complete -> {
+                    exercise.isSet1Complete = true
+                    exercise.exerMessage = "Congratulations. Please rest for $waitTime seconds."
+
+                    v.tv_exer_rep_1.setBackgroundColor(Color.GREEN)
+                    v.tv_exer_message.text = exercise.exerMessage
+
+                    chronoButtonRestart()
+                    NotificationUtil.scheduleNotification(this, "Ready to go", "Perform your next set now.", waitTime)
+                }
+                !exercise.isSet2Complete -> {
+                    exercise.isSet2Complete = true
+                    exercise.exerMessage = "Congratulations. Please rest for $waitTime seconds."
+
+                    v.tv_exer_rep_2.setBackgroundColor(Color.GREEN)
+                    v.tv_exer_message.text = exercise.exerMessage
+
+                    chronoButtonRestart()
+                    NotificationUtil.scheduleNotification(this, "Ready to go", "Perform your next set now.", waitTime)
+                }
+                !exercise.isSet3Complete -> {
                     exercise.isSet3Complete = true
+                    passExercise(exercise)
+
                     v.tv_exer_rep_3.setBackgroundColor(Color.GREEN)
-                    passExerciseView(v.tv_exer_rep_3)
+                    v.tv_exer_message.text = exercise.exerMessage
+
                     NotificationUtil.cancelPendingNotification(this)
                 }
-                exercise.isSet1Complete -> {
-                    exercise.isSet2Complete = true
-                    v.tv_exer_rep_2.setBackgroundColor(Color.GREEN)
-                    exercise.exerMessage = "Congratulations. Please rest for $waitTime seconds."
-                    v.tv_exer_message.text = exercise.exerMessage
-                    NotificationUtil.scheduleNotification(this, "Ready to go", "Perform your next set now.", waitTime)
-                }
+
                 else -> {
-                    exercise.isSet1Complete = true
-                    v.tv_exer_rep_1.setBackgroundColor(Color.GREEN)
-                    exercise.exerMessage = "Congratulations. Please rest for $waitTime seconds."
+                    exercise.isSet1Complete = false
+                    exercise.isSet2Complete = false
+                    exercise.isSet3Complete = false
+
+                    v.tv_exer_rep_1.setBackgroundColor(Color.TRANSPARENT)
+                    v.tv_exer_rep_2.setBackgroundColor(Color.TRANSPARENT)
+                    v.tv_exer_rep_3.setBackgroundColor(Color.TRANSPARENT)
+
+                    initializeExerciseEntity(exercise)
                     v.tv_exer_message.text = exercise.exerMessage
-                    NotificationUtil.scheduleNotification(this, "Ready to go", "Perform your next set now.", waitTime)
                 }
             }
         } else {
-            exercise.isSetTimeComplete = true
-            v.tv_exer_time.setBackgroundColor(Color.GREEN)
-            passExerciseView(v.tv_exer_rep_3)
-            NotificationUtil.cancelPendingNotification(this)
+            when {
+                !exercise.isSetTimeComplete -> {
+                    exercise.isSetTimeComplete = true
+                    passExercise(exercise)
+
+                    v.tv_exer_time.setBackgroundColor(Color.GREEN)
+                    v.tv_exer_message.text = exercise.exerMessage
+
+                    NotificationUtil.cancelPendingNotification(this)
+                }
+                exercise.isSetTimeComplete -> {
+                    exercise.isSetTimeComplete = false
+                    v.tv_exer_time.setBackgroundColor(Color.TRANSPARENT)
+
+                    initializeExerciseEntity(exercise)
+                    v.tv_exer_message.text = exercise.exerMessage
+                }
+            }
         }
     }
 
@@ -250,7 +292,7 @@ class WorkoutActivity : AppCompatActivity() {
         mExerciseList.forEachIndexed { i, it ->
             // Automatically pass all untouched exercises
             if (!it.isModified){
-                passExerciseAndSetMessage(i)
+                passExercise(it)
             }
 
             it.progressionName = it.nextProgressionName
