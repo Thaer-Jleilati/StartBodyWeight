@@ -1,27 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="com.epsilon.startbodyweight.SelectorActivity">
-    <ListView
-        android:id="@+id/lv_select_exers"
+<layout>
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.epsilon.startbodyweight.viewmodel.SelectorViewModel" />
+    </data>
+
+    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/b_save_exercises"
-        app:layout_constraintTop_toTopOf="parent">
-    </ListView>
-    <Button
-        android:id="@+id/b_save_exercises"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Continue"
-        android:onClick="saveExerciseSelections"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/lv_select_exers"/>
-</android.support.constraint.ConstraintLayout>
+        android:layout_height="match_parent"
+        tools:context="com.epsilon.startbodyweight.SelectorActivity">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv_select_exers"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@+id/b_save_exercises"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/b_save_exercises"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="saveExerciseSelections"
+            android:text="Continue"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/rv_select_exers" />
+    </android.support.constraint.ConstraintLayout>
+</layout>

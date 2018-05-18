@@ -1,9 +1,12 @@
 package com.epsilon.startbodyweight
 
+import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -20,6 +23,7 @@ import com.epsilon.startbodyweight.data.ExerData.Companion.MIN_EXERCISE_REPS
 import com.epsilon.startbodyweight.data.ExerData.Companion.MIN_EXERCISE_TIME
 import com.epsilon.startbodyweight.data.ExerciseEntity
 import com.epsilon.startbodyweight.data.RoomDB
+import com.epsilon.startbodyweight.viewmodel.SelectorViewModel
 import kotlinx.android.synthetic.main.activity_selector.*
 import kotlinx.android.synthetic.main.exercise_select.view.*
 import org.jetbrains.anko.doAsync
@@ -30,25 +34,14 @@ import kotlin.math.min
 
 class SelectorActivity : AppCompatActivity() {
     private val LTAG = SelectorActivity::class.qualifiedName
-    private val mExerciseList = ArrayList<ExerciseEntity>()
     private lateinit var mExerciseSelectAdapter: ExerciseSelectAdapter
+    private lateinit var mViewModel: SelectorViewModel
 
-    inner class ExerciseSelectAdapter(context: Context, exercise: ArrayList<ExerciseEntity>):
-            ArrayAdapter<ExerciseEntity>(context, 0, exercise) {
+    inner class ExerciseSelectViewHolder(private val context: Context, private val exerciseSelectView: View) :
+            RecyclerView.ViewHolder(exerciseSelectView) {
 
-        override fun getView(position: Int, inputView: View?, parent: ViewGroup): View {
-            // Get the data item for this position
-            val exercise = getItem(position)
-
-            // Reuse if an existing view is already inflated, otherwise inflate the view
-            var exerciseSelectView: View
-            if (inputView == null){
-                exerciseSelectView = LayoutInflater.from(context).inflate(R.layout.exercise_select, parent, false)
-            } else {
-                exerciseSelectView = inputView
-            }
-
-            exerciseSelectView.tag = position
+        fun bindExerciseSelectView(position: Int, exercise: ExerciseEntity) {
+            exerciseSelectView.tag = position // TODO modify this horrificness to use custom click listeners
 
             // Initialize our spinner
             val spinnerAdapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, exercise.allProgressions)
@@ -78,8 +71,25 @@ class SelectorActivity : AppCompatActivity() {
                 exerciseSelectView.tv_sel_rep_3.visibility = View.VISIBLE
                 setRepsInView(exerciseSelectView, exercise.set1Reps, exercise.set2Reps, exercise.set3Reps)
             }
+        }
 
-            return exerciseSelectView
+    }
+
+    inner class ExerciseSelectAdapter(private val context: Context, private val mExerciseList: ArrayList<ExerciseEntity>) :
+            RecyclerView.Adapter<ExerciseSelectViewHolder>() {
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExerciseSelectViewHolder {
+            val layoutInflater = LayoutInflater.from(parent.context)
+            val exerciseSelectView = layoutInflater.inflate(R.layout.exercise_select, parent, false)
+            return ExerciseSelectViewHolder(context, exerciseSelectView)
+        }
+
+        override fun onBindViewHolder(holder: ExerciseSelectViewHolder, index: Int) {
+            holder.bindExerciseSelectView(index, mExerciseList[index])
+        }
+
+        override fun getItemCount(): Int {
+            return mExerciseList.size
         }
     }
 
@@ -87,13 +97,20 @@ class SelectorActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_selector)
 
-        setupAdapter()
+        mViewModel = ViewModelProviders.of(this).get(SelectorViewModel::class.java)
+        //mViewModel.mExerciseList.observe( this, Observer { user -> Log.d("AEAER", user.)})
+
+        // Set up recycler view
+        setupRecyclerView()
+
     }
 
-    private fun setupAdapter() {
-        mExerciseSelectAdapter = ExerciseSelectAdapter(this, mExerciseList)
+    private fun setupRecyclerView() {
+        rv_select_exers.layoutManager = LinearLayoutManager(this)
+        rv_select_exers.setHasFixedSize(true)
+        mExerciseSelectAdapter = ExerciseSelectAdapter(this, mViewModel.mExerciseList.value!!)
         populateAdapterWithExercises(mExerciseSelectAdapter, intent.hasExtra("LOAD_FROM_DB"))
-        lv_select_exers.adapter = mExerciseSelectAdapter
+        rv_select_exers.adapter = mExerciseSelectAdapter
     }
 
     private fun populateAdapterWithExercises(exerciseSelectAdapter: ExerciseSelectAdapter, loadFromDB: Boolean) {
@@ -119,12 +136,12 @@ class SelectorActivity : AppCompatActivity() {
                     myDBExercises?.forEach {
                         it.allProgressions = completeExerciseList.getOrNull(it.exerciseNum)?.progs
                     }
-                    mExerciseSelectAdapter.addAll(myDBExercises)
+                    mViewModel.mExerciseList.value!!.addAll(myDBExercises!!)
                 } else {
                     // Loading exercises from JSON with defaults
-                    mExerciseSelectAdapter.addAll( ExerData.convertToExerciseEntityList(completeExerciseList))
+                    mViewModel.mExerciseList.value!!.addAll(ExerData.convertToExerciseEntityList(completeExerciseList))
                 }
-                mExerciseSelectAdapter.notifyDataSetChanged()
+                exerciseSelectAdapter.notifyDataSetChanged()
             }
         }
     }
@@ -140,7 +157,7 @@ class SelectorActivity : AppCompatActivity() {
     private fun incrementSet(v: View, smallIncrement: Boolean) {
         val exerciseSelectView = v.parent as LinearLayout
         val position = exerciseSelectView.tag as Int
-        val exercise = mExerciseSelectAdapter.getItem(position)
+        val exercise = mViewModel.mExerciseList.value!![position]
 
         if (exercise.isTimedExercise) {
             val timeIncrement = if (smallIncrement) 5 else 10
@@ -176,7 +193,7 @@ class SelectorActivity : AppCompatActivity() {
     private fun decrementSet(v: View, smallDecrement: Boolean) {
         val exerciseSelectView = v.parent as LinearLayout
         val position = exerciseSelectView.tag as Int
-        val exercise = mExerciseSelectAdapter.getItem(position)
+        val exercise = mViewModel.mExerciseList.value!![position]
         if (exercise.isTimedExercise) {
             val timeDecrement = if (smallDecrement) 5 else 10
             exercise.setTime = max(exercise.setTime - timeDecrement, MIN_EXERCISE_TIME)
@@ -204,9 +221,9 @@ class SelectorActivity : AppCompatActivity() {
         // Save our exercise list to the DB
         val db = RoomDB.get(this)
         doAsync {
-            val rowsAdded = db?.Dao()?.updateAll(mExerciseList)
+            val rowsAdded = db?.Dao()?.updateAll(mViewModel.mExerciseList.value!!)
             uiThread {
-                if (rowsAdded.orEmpty().size != mExerciseList.size) {
+                if (rowsAdded.orEmpty().size != mViewModel.mExerciseList.value?.size) {
                     Log.e(LTAG, "Failed to add selected exercises to Database.")
                 }
                 if (it.intent.hasExtra("SELECTED_FROM_MAIN_MENU")) {

@@ -22,6 +22,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    dataBinding{
+        enabled = true
+    }
 }
 
 dependencies {
@@ -47,6 +50,10 @@ dependencies {
 
     // Async
     implementation "org.jetbrains.anko:anko-commons:0.10.4"
+
+    //Android architecture components
+    def lifecycle_version = "1.1.1"
+    implementation "android.arch.lifecycle:extensions:$lifecycle_version"
 }
 
 repositories {
