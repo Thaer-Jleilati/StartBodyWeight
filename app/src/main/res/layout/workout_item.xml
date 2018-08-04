@@ -24,7 +24,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:textSize="24sp"
-        app:layout_constraintBaseline_toBaselineOf="@id/btn_exer_fail"
+        app:layout_constraintBaseline_toBaselineOf="@id/b_exer_fail"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_exer_name"
         tools:text="0" />
@@ -36,7 +36,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:textSize="24sp"
-        app:layout_constraintBaseline_toBaselineOf="@id/btn_exer_fail"
+        app:layout_constraintBaseline_toBaselineOf="@id/b_exer_fail"
         app:layout_constraintStart_toEndOf="@id/tv_exer_rep_1"
         app:layout_constraintTop_toBottomOf="@+id/tv_exer_name"
         tools:text="0" />
@@ -48,7 +48,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:textSize="24sp"
-        app:layout_constraintBaseline_toBaselineOf="@id/btn_exer_fail"
+        app:layout_constraintBaseline_toBaselineOf="@id/b_exer_fail"
         app:layout_constraintStart_toEndOf="@id/tv_exer_rep_2"
         app:layout_constraintTop_toBottomOf="@+id/tv_exer_name"
         tools:text="0" />
@@ -61,12 +61,12 @@
         android:layout_marginTop="8dp"
         android:text=""
         android:textSize="24sp"
-        app:layout_constraintBaseline_toBaselineOf="@id/btn_exer_fail"
+        app:layout_constraintBaseline_toBaselineOf="@id/b_exer_fail"
         app:layout_constraintStart_toEndOf="@id/tv_exer_rep_1"
         app:layout_constraintTop_toBottomOf="@+id/tv_exer_name" />
 
     <!--Button
-        android:id="@+id/btn_exer_pass"
+        android:id="@+id/b_exer_pass"
         style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -74,14 +74,13 @@
         android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
         android:backgroundTint="@android:color/holo_green_light"
-        android:onClipassExerciseView"
         android:text="Pass"
         android:textSize="20sp"
         app:layout_constraintEnd_toStartOf="@id/btn_exer_fail"
         app:layout_constraintTop_toBottomOf="@id/tv_exer_name" /-->
 
     <Button
-        android:id="@+id/btn_exer_fail"
+        android:id="@+id/b_exer_fail"
         style="@style/Widget.AppCompat.Button.Colored"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -89,7 +88,6 @@
         android:layout_marginEnd="8dp"
         android:layout_marginTop="8dp"
         android:backgroundTint="@android:color/holo_red_dark"
-        android:onClick="failExerciseView"
         android:text="Fail"
         android:textColorLink="@android:color/holo_red_dark"
         android:textSize="20sp"
@@ -103,7 +101,7 @@
         android:layout_marginEnd="8dp"
         android:layout_marginStart="16dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btn_exer_fail"
+        app:layout_constraintTop_toBottomOf="@id/b_exer_fail"
         tools:text="Soon you will have glutes of steel." />
 
 </android.support.constraint.ConstraintLayout>

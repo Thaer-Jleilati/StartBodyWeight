@@ -18,16 +18,16 @@ class ExerData {
         const val MIN_EXERCISE_REPS = 4
         const val MAX_EXERCISE_REPS = 8
 
-        private var mCompleteExerciseList: List<Exercise>? = null
+        private var mCompleteExerciseList: Map<Int, Exercise>? = null
 
         // Singleton so we load list only once
-        fun getExerciseList(res: Resources): List<Exercise>?{
+        fun getExerciseList(res: Resources): Map<Int, Exercise> {
             if (mCompleteExerciseList == null) {
                 synchronized(ExerData::class){
-                    mCompleteExerciseList = loadExerciseListFromFile(res)
+                    mCompleteExerciseList = loadExerciseListFromFile(res).orEmpty().map { it.exerciseNum to it }.toMap()
                 }
             }
-            return mCompleteExerciseList
+            return mCompleteExerciseList.orEmpty()
         }
 
         private fun loadExerciseListFromFile(res: Resources) : List<Exercise>?{
@@ -39,24 +39,9 @@ class ExerData {
             return parsedExers
         }
 
-        fun setNextProgression(res: Resources, exercise: ExerciseEntity){
-            val exerciseList = getExerciseList(res)
-            val progs = exerciseList?.get(exercise.exerciseNum)?.progs.orEmpty()
-
-            // Move up in our progession
-            if (exercise.progressionNumber + 1 < progs.size) {
-                exercise.nextProgressionNumber = exercise.progressionNumber + 1
-                exercise.nextProgressionName = progs[exercise.nextProgressionNumber]
-            }
-            //If we have maxed out our progressions, stay on the final progression
-            else {
-                exercise.nextProgressionNumber = exercise.progressionNumber
-                exercise.nextProgressionName = exercise.progressionName
-            }
-        }
-
-        fun convertToExerciseEntityList(jsonExerciseList: List<Exercise>?): List<ExerciseEntity>{
-            return jsonExerciseList.orEmpty().map {
+        fun convertToExerciseEntityList(jsonExerciseList: Map<Int, Exercise>): List<ExerciseEntity> {
+            var sortedExercisesByNum = jsonExerciseList.toSortedMap().values
+            return sortedExercisesByNum.map {
                 ExerciseEntity(it.name, it.exerciseNum, "", 0,
                         MIN_EXERCISE_REPS, MIN_EXERCISE_REPS, MIN_EXERCISE_REPS, MIN_EXERCISE_TIME,
                         isTimedExercise(it.name),0, it.progs,

@@ -6,11 +6,10 @@
     android:orientation="vertical"
     android:theme="@style/AppTheme.AppBarOverlay">
 
-    <ListView
-        android:id="@+id/lv_workout_exers"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_workout_exers"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@id/b_complete_workout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -19,7 +19,7 @@ data class ExerciseEntity(
         var numAttempts: Int = 0,
 
         // Do not store the following items in our DB
-        @Ignore var allProgressions: ArrayList<String>? = ArrayList(),
+        @Ignore var allProgressions: ArrayList<String> = ArrayList(),
         @Ignore var nextSet1Reps: Int = 0,
         @Ignore var nextSet2Reps: Int = 0,
         @Ignore var nextSet3Reps: Int = 0,

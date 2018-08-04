@@ -22,7 +22,6 @@
         android:layout_weight="1"
         android:minHeight="0dp"
         android:minWidth="0dp"
-        android:onClick="incrementSetSmall"
         android:padding="16px"
         android:text="↑" />
     <TextView
@@ -69,7 +68,6 @@
         android:layout_weight="1"
         android:minHeight="0dp"
         android:minWidth="0dp"
-        android:onClick="decrementSetSmall"
         android:padding="16px"
         android:text="↓"/>
 </LinearLayout>
