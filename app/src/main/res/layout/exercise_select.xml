@@ -3,14 +3,15 @@
     <data>
         <import type="android.view.View"/>
         <variable
-            name="exerciseEntity"
-            type="com.epsilon.startbodyweight.data.ExerciseEntity"/>
-        <variable
             name="viewModel"
             type="com.epsilon.startbodyweight.selectorActivity.SelectorViewModel"/>
         <variable
             name="spinnerAdapter"
             type="android.widget.ArrayAdapter" />
+
+        <variable
+            name="index"
+            type="int" />
     </data>
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
@@ -28,8 +29,8 @@
             android:spinnerMode="dropdown"
             android:textSize="25sp"
             android:adapter="@{spinnerAdapter}"
-            android:selection="@{exerciseEntity.progressionNumber}"
-            android:onItemSelected="@{(parent,view,position,id) -> viewModel.onItemSelectedSpinner(parent,position,exerciseEntity)}"/>
+            android:onItemSelected="@{(parent,view,position,id) -> viewModel.onItemSelectedSpinner(parent,position,viewModel.exerciseList[index])}"
+            android:selection="@{viewModel.exerciseList[index].progressionNumber}" />
         <Button
             android:id="@+id/b_sel_increase_reps_small"
             android:layout_width="wrap_content"
@@ -39,7 +40,7 @@
             android:minHeight="0dp"
             android:minWidth="0dp"
             android:padding="16dp"
-            android:onClick="@{() -> viewModel.incrementSet(exerciseEntity, true)}"
+            android:onClick="@{() -> viewModel.incrementSet(viewModel.exerciseList[index], true)}"
             android:text="↑" />
         <TextView
             android:id="@+id/tv_sel_rep_1"
@@ -49,9 +50,8 @@
             android:gravity="center"
             android:minHeight="0dp"
             android:minWidth="0dp"
-            android:text="@{viewModel.ayy}"
-            android:visibility="@{!exerciseEntity.isTimedExercise ? View.VISIBLE : View.GONE}"/>
-<!--android:text="@{String.valueOf(exerciseEntity.set1Reps)}"-->
+            android:text="@{String.valueOf(viewModel.exerciseList[index].set1Reps)}"
+            android:visibility="@{!viewModel.exerciseList[index].isTimedExercise ? View.VISIBLE : View.GONE}" />
         <TextView
             android:id="@+id/tv_sel_rep_2"
             android:layout_width="wrap_content"
@@ -60,8 +60,8 @@
             android:gravity="center"
             android:minHeight="0dp"
             android:minWidth="0dp"
-            android:text="@{String.valueOf(exerciseEntity.set2Reps)}"
-            android:visibility="@{!exerciseEntity.isTimedExercise ? View.VISIBLE : View.GONE}"/>
+            android:text="@{String.valueOf(viewModel.exerciseList[index].set2Reps)}"
+            android:visibility="@{!viewModel.exerciseList[index].isTimedExercise ? View.VISIBLE : View.GONE}" />
 
         <TextView
             android:id="@+id/tv_sel_rep_3"
@@ -71,8 +71,8 @@
             android:gravity="center"
             android:minHeight="0dp"
             android:minWidth="0dp"
-            android:text="@{String.valueOf(exerciseEntity.set3Reps)}"
-            android:visibility="@{!exerciseEntity.isTimedExercise ? View.VISIBLE : View.GONE}"/>
+            android:text="@{String.valueOf(viewModel.exerciseList[index].set3Reps)}"
+            android:visibility="@{!viewModel.exerciseList[index].isTimedExercise ? View.VISIBLE : View.GONE}" />
         <TextView
             android:id="@+id/tv_sel_time"
             android:layout_width="wrap_content"
@@ -81,8 +81,8 @@
             android:gravity="center"
             android:minHeight="0dp"
             android:minWidth="0dp"
-            android:text="@{String.valueOf(exerciseEntity.setTime)}"
-            android:visibility="@{exerciseEntity.isTimedExercise ? View.VISIBLE : View.GONE}"/>
+            android:text="@{String.valueOf(viewModel.exerciseList[index].setTime)}"
+            android:visibility="@{viewModel.exerciseList[index].isTimedExercise ? View.VISIBLE : View.GONE}" />
         <Button
             android:id="@+id/b_sel_reduce_reps_small"
             android:layout_width="wrap_content"
@@ -92,7 +92,7 @@
             android:minHeight="0dp"
             android:minWidth="0dp"
             android:padding="16dp"
-            android:onClick="@{() -> viewModel.decrementSet(exerciseEntity, true)}"
+            android:onClick="@{() -> viewModel.decrementSet(viewModel.exerciseList[index], true)}"
             android:text="↓"/>
     </LinearLayout>
 </layout>
