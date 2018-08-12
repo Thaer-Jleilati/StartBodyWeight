@@ -9,8 +9,7 @@ import com.epsilon.startbodyweight.data.ExerciseEntity
 import com.epsilon.startbodyweight.databinding.ExerciseSelectBinding
 
 class ExerciseSelectViewHolder(private val mDataBinding: ExerciseSelectBinding,
-                               private val mLifecycleOwner: LifecycleOwner,
-                               private val mViewModel: SelectorViewModel):
+                               private val mLifecycleOwner: LifecycleOwner) :
         RecyclerView.ViewHolder(mDataBinding.root){
 
     init {
@@ -18,9 +17,8 @@ class ExerciseSelectViewHolder(private val mDataBinding: ExerciseSelectBinding,
         mDataBinding.setLifecycleOwner(mLifecycleOwner)
     }
 
-    fun bindExerciseSelectView(exerciseEntity: ExerciseEntity) {
-        mDataBinding.exerciseEntity = exerciseEntity
-        mDataBinding.viewModel = mViewModel
+    fun bindExerciseSelectView(exerciseEntity: ExerciseEntity, index: Int) {
+        mDataBinding.index = index
         mDataBinding.spinnerAdapter = ArrayAdapter(mLifecycleOwner as Context,
                 R.layout.simple_spinner_dropdown_item,
                 exerciseEntity.allProgressions)

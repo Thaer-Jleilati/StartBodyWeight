@@ -1,6 +1,5 @@
 package com.epsilon.startbodyweight.selectorActivity
 
-import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.content.res.Resources
@@ -13,10 +12,8 @@ import com.epsilon.startbodyweight.MainActivity
 import com.epsilon.startbodyweight.R
 import com.epsilon.startbodyweight.WorkoutActivity.WorkoutActivity
 import com.epsilon.startbodyweight.data.ExerData
-import com.epsilon.startbodyweight.data.ExerciseEntity
 import com.epsilon.startbodyweight.data.RoomDB
 import kotlinx.android.synthetic.main.activity_selector.*
-import kotlinx.android.synthetic.main.exercise_select.view.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 
@@ -30,15 +27,11 @@ class SelectorActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_selector)
 
-        Log.e(LTAG, "LOLTEST")
-
         mViewModel = ViewModelProviders.of(this).get(SelectorViewModel::class.java)
         mExerciseSelectAdapter = ExerciseSelectAdapter(this, mViewModel)
 
         setupRecyclerView()
         loadExerciseList(intent.hasExtra("LOAD_FROM_DB"), resources)
-
-        mViewModel.exerciseList.observe(this, Observer { _ -> Log.e(LTAG, "AYY OBSERVED") })
     }
 
     private fun setupRecyclerView(){
@@ -79,7 +72,7 @@ class SelectorActivity : AppCompatActivity() {
                     mViewModel.populateExerciseListFromJson(completeExerciseList)
                 }
 
-                mExerciseSelectAdapter.notifyDataSetChanged()
+                mExerciseSelectAdapter.notifyDataSetChanged() // TODO test if needed?
             }
         }
     }
@@ -88,9 +81,12 @@ class SelectorActivity : AppCompatActivity() {
         // Save our exercise list to the DB
         val db = RoomDB.get(this)
         doAsync {
-            val rowsAdded = db?.Dao()?.updateAll(mViewModel.exerciseList.value!!) // TODO
+            val exerciseListToSave =
+                    if (mViewModel.exerciseList.value != null) mViewModel.exerciseList.value!!
+                    else ArrayList()
+            val rowsAdded = db?.Dao()?.updateAll(exerciseListToSave)
             uiThread {
-                if (rowsAdded.orEmpty().size != mViewModel.exerciseList.value?.size) {
+                if (rowsAdded.orEmpty().size != exerciseListToSave.size) {
                     Log.e(LTAG, "Failed to add selected exercises to Database.")
                 }
                 if (it.intent.hasExtra("SELECTED_FROM_MAIN_MENU")) {
@@ -99,17 +95,6 @@ class SelectorActivity : AppCompatActivity() {
                     startActivity(Intent(it, WorkoutActivity::class.java))
                 }
             }
-        }
-    }
-
-    // todo redundant with observer notify dataset changed?
-    private fun setRepsInView(exerciseSelectView: View, exercise: ExerciseEntity) {
-        if (exercise.isTimedExercise) {
-            exerciseSelectView.tv_sel_time.text = exercise.setTime.toString()
-        } else {
-            exerciseSelectView.tv_sel_rep_1.text = exercise.set1Reps.toString()
-            exerciseSelectView.tv_sel_rep_2.text = exercise.set2Reps.toString()
-            exerciseSelectView.tv_sel_rep_3.text = exercise.set3Reps.toString()
         }
     }
 }

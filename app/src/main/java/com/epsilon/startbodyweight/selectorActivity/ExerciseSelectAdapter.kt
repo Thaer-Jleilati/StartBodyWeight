@@ -24,13 +24,13 @@ class ExerciseSelectAdapter(private val mLifecycleOwner: LifecycleOwner,
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExerciseSelectViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
-        val dataBinding: ExerciseSelectBinding = DataBindingUtil.inflate(layoutInflater, R.layout.exercise_select, parent, false);
-        dataBinding.setLifecycleOwner(mLifecycleOwner)
-        return ExerciseSelectViewHolder(dataBinding, mLifecycleOwner, mViewModel)
+        val dataBinding: ExerciseSelectBinding = DataBindingUtil.inflate(layoutInflater, R.layout.exercise_select, parent, false)
+        dataBinding.viewModel = mViewModel
+        return ExerciseSelectViewHolder(dataBinding, mLifecycleOwner)
     }
 
     override fun onBindViewHolder(holder: ExerciseSelectViewHolder, index: Int) {
-        holder.bindExerciseSelectView(mExerciseList[index])
+        holder.bindExerciseSelectView(mExerciseList[index], index)
     }
 
     override fun getItemCount(): Int {
