@@ -1,4 +1,4 @@
-package com.epsilon.startbodyweight
+package com.epsilon.startbodyweight.WorkoutActivity
 
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
@@ -13,15 +13,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import com.epsilon.startbodyweight.MainActivity
+import com.epsilon.startbodyweight.R
 import com.epsilon.startbodyweight.data.ExerData
 import com.epsilon.startbodyweight.data.ExerciseEntity
 import com.epsilon.startbodyweight.data.RoomDB
 import com.epsilon.startbodyweight.notif.NotificationUtil
-import com.epsilon.startbodyweight.viewmodel.WorkoutViewModel
 import kotlinx.android.synthetic.main.activity_workout.*
 import kotlinx.android.synthetic.main.workout_item.view.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
+
 
 class WorkoutActivity : AppCompatActivity() {
     private val LTAG = WorkoutActivity::class.qualifiedName
@@ -99,6 +101,11 @@ class WorkoutActivity : AppCompatActivity() {
         setContentView(R.layout.activity_workout)
 
         mViewModel = ViewModelProviders.of(this).get(WorkoutViewModel::class.java)
+  //      val exerciseListObserver = Observer<String> {
+//            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+       // }
+        // Observe the LiveData, passing in this activity as the LifecycleOwner and the observer.
+        //mViewModel.mExerciseList.observe(this, exerciseListObserver)
 
         setupPrefs()
         setupChron()
@@ -113,7 +120,7 @@ class WorkoutActivity : AppCompatActivity() {
     }
 
     private fun setupAdapter() {
-        mWorkoutItemAdapter = WorkoutItemAdapter(mViewModel.mExerciseList)
+        mWorkoutItemAdapter = WorkoutItemAdapter(mViewModel.mExerciseList.value!!)
         populateAdapterWithExercises(mWorkoutItemAdapter)
         rv_workout_exers.adapter = mWorkoutItemAdapter
     }
@@ -204,9 +211,9 @@ class WorkoutActivity : AppCompatActivity() {
 
         val db = RoomDB.get(this)
         doAsync {
-            val rowsAdded = db?.Dao()?.updateAll(mViewModel.mExerciseList)
+            val rowsAdded = db?.Dao()?.updateAll(mViewModel.mExerciseList.value!!)
             uiThread {
-                if (rowsAdded.orEmpty().size != mViewModel.mExerciseList.size) {
+                if (rowsAdded.orEmpty().size != mViewModel.mExerciseList.value?.size) {
                     Log.e(LTAG, "Failed to add updated exercises to Database.")
                 }
                 startActivity(Intent(it, MainActivity::class.java))

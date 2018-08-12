@@ -1,7 +1,10 @@
-package com.epsilon.startbodyweight.viewmodel
+package com.epsilon.startbodyweight.selectorActivity
 
+import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
+import android.view.View
+import android.widget.Spinner
 import com.epsilon.startbodyweight.data.ExerData
 import com.epsilon.startbodyweight.data.Exercise
 import com.epsilon.startbodyweight.data.ExerciseEntity
@@ -9,29 +12,42 @@ import kotlin.math.max
 import kotlin.math.min
 
 class SelectorViewModel : ViewModel() {
-    var mExerciseList = MutableLiveData<ArrayList<ExerciseEntity>>()
+    private val mExerciseList = MutableLiveData<ArrayList<ExerciseEntity>>()
+    val exerciseList : LiveData<ArrayList<ExerciseEntity>>
+        get() = mExerciseList
+    val ayy = MutableLiveData<String>()
 
     init {
         mExerciseList.value = ArrayList()
+        ayy.value = "10"
     }
 
     fun populateExerciseListFromDB(myDBExercises: List<ExerciseEntity>, completeExerciseList: Map<Int, Exercise>) {
         // Load our progression list for each exercise from the JSON data and add it to our exercise data
         myDBExercises.forEach {
             var exerciseEntryInList = completeExerciseList[it.exerciseNum]
-            it.allProgressions = if (exerciseEntryInList != null) exerciseEntryInList.progs else ArrayList()
+            it.allProgressions = exerciseEntryInList?.progs ?: ArrayList()
         }
+
         mExerciseList.value?.addAll(myDBExercises)
+        mExerciseList.value = mExerciseList.value
     }
 
     fun populateExerciseListFromJson(completeExerciseList: Map<Int, Exercise>) {
         mExerciseList.value?.addAll(ExerData.convertToExerciseEntityList(completeExerciseList))
+        mExerciseList.value = mExerciseList.value
     }
 
     private fun updateRepsInExercise(exercise: ExerciseEntity, reps1: Int, reps2: Int, reps3: Int) {
         exercise.set1Reps = reps1
         exercise.set2Reps = reps2
         exercise.set3Reps = reps3
+
+        // Force our livedata to detect a change
+        // TODO: not doing anything after increment set, our view is not updating
+        mExerciseList.value = mExerciseList.value
+
+        if (ayy.value == "10") ayy.value = "99" else { ayy.value = "10"}
     }
 
     fun incrementSet(exercise: ExerciseEntity, smallIncrement: Boolean) {
@@ -74,5 +90,10 @@ class SelectorViewModel : ViewModel() {
 
             updateRepsInExercise(exercise, numReps1, numReps2, numReps3)
         }
+    }
+
+    fun onItemSelectedSpinner(parent: View, position: Int, exercise: ExerciseEntity){
+        exercise.progressionNumber = position
+        exercise.progressionName = (parent as Spinner).selectedItem.toString()
     }
 }

@@ -1,73 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="horizontal">
-
-    <Spinner
-        android:id="@+id/sp_sel_exer"
-        android:layout_width="0dp"
+<layout>
+    <data>
+        <import type="android.view.View"/>
+        <variable
+            name="exerciseEntity"
+            type="com.epsilon.startbodyweight.data.ExerciseEntity"/>
+        <variable
+            name="viewModel"
+            type="com.epsilon.startbodyweight.selectorActivity.SelectorViewModel"/>
+        <variable
+            name="spinnerAdapter"
+            type="android.widget.ArrayAdapter" />
+    </data>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_weight="20"
-        android:background="@android:drawable/btn_dropdown"
-        android:spinnerMode="dropdown"
-        android:textSize="25sp" />
-    <Button
-        android:id="@+id/b_sel_increase_reps_small"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_margin="8px"
-        android:layout_weight="1"
-        android:minHeight="0dp"
-        android:minWidth="0dp"
-        android:padding="16px"
-        android:text="↑" />
-    <TextView
-        android:id="@+id/tv_sel_rep_1"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:minHeight="0dp"
-        android:minWidth="0dp"
-        android:text="x" />
-    <TextView
-        android:id="@+id/tv_sel_rep_2"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:minHeight="0dp"
-        android:minWidth="0dp"
-        android:text="x" />
-    <TextView
-        android:id="@+id/tv_sel_rep_3"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:minHeight="0dp"
-        android:minWidth="0dp"
-        android:text="x" />
-    <TextView
-        android:id="@+id/tv_sel_time"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:minHeight="0dp"
-        android:minWidth="0dp"
-        android:text="0" />
-    <Button
-        android:id="@+id/b_sel_reduce_reps_small"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_margin="8px"
-        android:layout_weight="1"
-        android:minHeight="0dp"
-        android:minWidth="0dp"
-        android:padding="16px"
-        android:text="↓"/>
-</LinearLayout>
+        android:orientation="horizontal">
+
+        <Spinner
+            android:id="@+id/sp_sel_exer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_weight="20"
+            android:background="@android:drawable/btn_dropdown"
+            android:spinnerMode="dropdown"
+            android:textSize="25sp"
+            android:adapter="@{spinnerAdapter}"
+            android:selection="@{exerciseEntity.progressionNumber}"
+            android:onItemSelected="@{(parent,view,position,id) -> viewModel.onItemSelectedSpinner(parent,position,exerciseEntity)}"/>
+        <Button
+            android:id="@+id/b_sel_increase_reps_small"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_margin="8dp"
+            android:layout_weight="1"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:padding="16dp"
+            android:onClick="@{() -> viewModel.incrementSet(exerciseEntity, true)}"
+            android:text="↑" />
+        <TextView
+            android:id="@+id/tv_sel_rep_1"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:text="@{viewModel.ayy}"
+            android:visibility="@{!exerciseEntity.isTimedExercise ? View.VISIBLE : View.GONE}"/>
+<!--android:text="@{String.valueOf(exerciseEntity.set1Reps)}"-->
+        <TextView
+            android:id="@+id/tv_sel_rep_2"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:text="@{String.valueOf(exerciseEntity.set2Reps)}"
+            android:visibility="@{!exerciseEntity.isTimedExercise ? View.VISIBLE : View.GONE}"/>
+
+        <TextView
+            android:id="@+id/tv_sel_rep_3"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:text="@{String.valueOf(exerciseEntity.set3Reps)}"
+            android:visibility="@{!exerciseEntity.isTimedExercise ? View.VISIBLE : View.GONE}"/>
+        <TextView
+            android:id="@+id/tv_sel_time"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:text="@{String.valueOf(exerciseEntity.setTime)}"
+            android:visibility="@{exerciseEntity.isTimedExercise ? View.VISIBLE : View.GONE}"/>
+        <Button
+            android:id="@+id/b_sel_reduce_reps_small"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_margin="8dp"
+            android:layout_weight="1"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:padding="16dp"
+            android:onClick="@{() -> viewModel.decrementSet(exerciseEntity, true)}"
+            android:text="↓"/>
+    </LinearLayout>
+</layout>

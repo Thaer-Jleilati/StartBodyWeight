@@ -21,7 +21,7 @@
         </activity>
         <!-- Keep only a single workout activity, and bring the existing instance to the front of the stack if its opened from a notification -->
         <activity
-            android:name=".WorkoutActivity"
+            android:name=".WorkoutActivity.WorkoutActivity"
             android:launchMode="singleTask"
             android:parentActivityName=".MainActivity">
             <meta-data
@@ -29,7 +29,7 @@
                 android:value=".MainActivity" />
         </activity>
         <activity
-            android:name=".SelectorActivity"
+            android:name=".selectorActivity.SelectorActivity"
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

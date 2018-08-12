@@ -7,7 +7,7 @@ import android.arch.persistence.room.RoomDatabase
 import android.arch.persistence.room.migration.Migration
 import android.content.Context
 import android.util.Log
-import com.epsilon.startbodyweight.SelectorActivity
+import com.epsilon.startbodyweight.selectorActivity.SelectorActivity
 
 @Database(entities = [ExerciseEntity::class], version = 10)
 abstract class RoomDB : RoomDatabase() {

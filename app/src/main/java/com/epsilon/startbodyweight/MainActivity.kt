@@ -9,6 +9,8 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import com.epsilon.startbodyweight.selectorActivity.SelectorActivity
+import com.epsilon.startbodyweight.WorkoutActivity.WorkoutActivity
 import com.epsilon.startbodyweight.data.DBHelperUtil
 import com.epsilon.startbodyweight.data.RoomDB
 import com.epsilon.startbodyweight.notif.NotificationUtil
