@@ -9,8 +9,7 @@ import com.epsilon.startbodyweight.R
 import com.epsilon.startbodyweight.data.ExerciseEntity
 import com.epsilon.startbodyweight.databinding.ExerciseSelectBinding
 
-class ExerciseSelectAdapter(private val mLifecycleOwner: LifecycleOwner,
-                            private val mViewModel: SelectorViewModel) :
+class ExerciseSelectAdapter(private val mViewModel: SelectorViewModel) :
         RecyclerView.Adapter<ExerciseSelectViewHolder>() {
     private lateinit var mExerciseList: ArrayList<ExerciseEntity>
 
@@ -26,7 +25,8 @@ class ExerciseSelectAdapter(private val mLifecycleOwner: LifecycleOwner,
         val layoutInflater = LayoutInflater.from(parent.context)
         val dataBinding: ExerciseSelectBinding = DataBindingUtil.inflate(layoutInflater, R.layout.exercise_select, parent, false)
         dataBinding.viewModel = mViewModel
-        return ExerciseSelectViewHolder(dataBinding, mLifecycleOwner)
+        dataBinding.setLifecycleOwner(parent.context as LifecycleOwner)
+        return ExerciseSelectViewHolder(dataBinding)
     }
 
     override fun onBindViewHolder(holder: ExerciseSelectViewHolder, index: Int) {

@@ -10,9 +10,9 @@ import android.util.Log
 import android.view.View
 import com.epsilon.startbodyweight.MainActivity
 import com.epsilon.startbodyweight.R
-import com.epsilon.startbodyweight.WorkoutActivity.WorkoutActivity
 import com.epsilon.startbodyweight.data.ExerData
 import com.epsilon.startbodyweight.data.RoomDB
+import com.epsilon.startbodyweight.workoutActivity.WorkoutActivity
 import kotlinx.android.synthetic.main.activity_selector.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
@@ -28,7 +28,7 @@ class SelectorActivity : AppCompatActivity() {
         setContentView(R.layout.activity_selector)
 
         mViewModel = ViewModelProviders.of(this).get(SelectorViewModel::class.java)
-        mExerciseSelectAdapter = ExerciseSelectAdapter(this, mViewModel)
+        mExerciseSelectAdapter = ExerciseSelectAdapter(mViewModel)
 
         setupRecyclerView()
         loadExerciseList(intent.hasExtra("LOAD_FROM_DB"), resources)

@@ -15,11 +15,9 @@ class SelectorViewModel : ViewModel() {
     private val mExerciseList = MutableLiveData<ArrayList<ExerciseEntity>>()
     val exerciseList : LiveData<ArrayList<ExerciseEntity>>
         get() = mExerciseList
-    val ayy = MutableLiveData<String>()
 
     init {
         mExerciseList.value = ArrayList()
-        ayy.value = "10"
     }
 
     fun populateExerciseListFromDB(myDBExercises: List<ExerciseEntity>, completeExerciseList: Map<Int, Exercise>) {
@@ -44,13 +42,10 @@ class SelectorViewModel : ViewModel() {
         exercise.set3Reps = reps3
 
         // Force our livedata to detect a change
-        // TODO: not doing anything after increment set, our view is not updating
         mExerciseList.value = mExerciseList.value
-
-        if (ayy.value == "10") ayy.value = "99" else { ayy.value = "10"}
     }
 
-    fun incrementSet(exercise: ExerciseEntity, smallIncrement: Boolean) {
+    fun incrementSet(exercise: ExerciseEntity, smallIncrement: Boolean = true) {
         if (exercise.isTimedExercise) {
             val timeIncrement = if (smallIncrement) 5 else 10
             exercise.setTime = min(exercise.setTime + timeIncrement, ExerData.MAX_EXERCISE_TIME)
@@ -71,7 +66,7 @@ class SelectorViewModel : ViewModel() {
         }
     }
 
-    fun decrementSet(exercise: ExerciseEntity, smallDecrement: Boolean) {
+    fun decrementSet(exercise: ExerciseEntity, smallDecrement: Boolean = true) {
         if (exercise.isTimedExercise) {
             val timeDecrement = if (smallDecrement) 5 else 10
             exercise.setTime = max(exercise.setTime - timeDecrement, ExerData.MIN_EXERCISE_TIME)
