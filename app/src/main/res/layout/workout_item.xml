@@ -1,107 +1,134 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:onClick="completeSet">
+<layout>
 
-    <TextView
-        android:id="@+id/tv_exer_name"
-        android:layout_width="wrap_content"
+    <data>
+
+        <import type="android.view.View" />
+
+        <import type="com.epsilon.startbodyweight.data.ExerciseEntity" />
+
+        <import type="android.graphics.Color" />
+
+        <variable
+            name="viewModel"
+            type="com.epsilon.startbodyweight.workoutActivity.WorkoutViewModel" />
+
+        <variable
+            name="exercise"
+            type="android.arch.lifecycle.MutableLiveData&lt;ExerciseEntity&gt;" />
+    </data>
+
+    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:textSize="24sp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="Herculean thrust" />
+        android:onClick="@{() -> viewModel.completeSet(exercise)}">
 
-    <TextView
-        android:id="@+id/tv_exer_rep_1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:textSize="24sp"
-        app:layout_constraintBaseline_toBaselineOf="@id/b_exer_fail"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_exer_name"
-        tools:text="0" />
+        <TextView
+            android:id="@+id/tv_exer_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:text="@{String.valueOf(exercise.progressionName)}"
+            android:textSize="24sp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/tv_exer_rep_2"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:textSize="24sp"
-        app:layout_constraintBaseline_toBaselineOf="@id/b_exer_fail"
-        app:layout_constraintStart_toEndOf="@id/tv_exer_rep_1"
-        app:layout_constraintTop_toBottomOf="@+id/tv_exer_name"
-        tools:text="0" />
+        <TextView
+            android:id="@+id/tv_exer_rep_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:backgroundColor="@{exercise.isSet1Complete? Color.GREEN : Color.TRANSPARENT}"
+            android:text="@{String.valueOf(exercise.set1Reps)}"
+            android:textSize="24sp"
+            android:visibility="@{!exercise.isTimedExercise ? View.VISIBLE : View.GONE}"
+            app:layout_constraintBaseline_toBaselineOf="@id/b_exer_fail"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_exer_name" />
 
-    <TextView
-        android:id="@+id/tv_exer_rep_3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:textSize="24sp"
-        app:layout_constraintBaseline_toBaselineOf="@id/b_exer_fail"
-        app:layout_constraintStart_toEndOf="@id/tv_exer_rep_2"
-        app:layout_constraintTop_toBottomOf="@+id/tv_exer_name"
-        tools:text="0" />
+        <TextView
+            android:id="@+id/tv_exer_rep_2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:backgroundColor="@{exercise.isSet2Complete? Color.GREEN : Color.TRANSPARENT}"
+            android:text="@{String.valueOf(exercise.set2Reps)}"
+            android:textSize="24sp"
+            android:visibility="@{!exercise.isTimedExercise ? View.VISIBLE : View.GONE}"
+            app:layout_constraintBaseline_toBaselineOf="@id/b_exer_fail"
+            app:layout_constraintStart_toEndOf="@id/tv_exer_rep_1"
+            app:layout_constraintTop_toBottomOf="@+id/tv_exer_name" />
 
-    <TextView
-        android:id="@+id/tv_exer_time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:text=""
-        android:textSize="24sp"
-        app:layout_constraintBaseline_toBaselineOf="@id/b_exer_fail"
-        app:layout_constraintStart_toEndOf="@id/tv_exer_rep_1"
-        app:layout_constraintTop_toBottomOf="@+id/tv_exer_name" />
+        <TextView
+            android:id="@+id/tv_exer_rep_3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:backgroundColor="@{exercise.isSet3Complete? Color.GREEN : Color.TRANSPARENT}"
+            android:text="@{String.valueOf(exercise.set3Reps)}"
+            android:textSize="24sp"
+            android:visibility="@{!exercise.isTimedExercise ? View.VISIBLE : View.GONE}"
+            app:layout_constraintBaseline_toBaselineOf="@id/b_exer_fail"
+            app:layout_constraintStart_toEndOf="@id/tv_exer_rep_2"
+            app:layout_constraintTop_toBottomOf="@+id/tv_exer_name" />
 
-    <!--Button
-        android:id="@+id/b_exer_pass"
-        style="@style/Widget.AppCompat.Button.Colored"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginTop="8dp"
-        android:backgroundTint="@android:color/holo_green_light"
-        android:text="Pass"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toStartOf="@id/btn_exer_fail"
-        app:layout_constraintTop_toBottomOf="@id/tv_exer_name" /-->
+        <TextView
+            android:id="@+id/tv_exer_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:backgroundColor="@{exercise.isSetTimeComplete? Color.GREEN : Color.TRANSPARENT}"
+            android:text="@{String.valueOf(exercise.setTime)}"
+            android:textSize="24sp"
+            android:visibility="@{exercise.isTimedExercise ? View.VISIBLE : View.GONE}"
+            app:layout_constraintBaseline_toBaselineOf="@id/b_exer_fail"
+            app:layout_constraintStart_toEndOf="@id/tv_exer_rep_1"
+            app:layout_constraintTop_toBottomOf="@+id/tv_exer_name" />
 
-    <Button
-        android:id="@+id/b_exer_fail"
-        style="@style/Widget.AppCompat.Button.Colored"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginTop="8dp"
-        android:backgroundTint="@android:color/holo_red_dark"
-        android:text="Fail"
-        android:textColorLink="@android:color/holo_red_dark"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_exer_name" />
+        <!--Button
+            android:id="@+id/b_exer_pass"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="@android:color/holo_green_light"
+            android:text="Pass"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toStartOf="@id/btn_exer_fail"
+            app:layout_constraintTop_toBottomOf="@id/tv_exer_name" /-->
 
-    <TextView
-        android:id="@+id/tv_exer_message"
-        android:layout_width="0px"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="16dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/b_exer_fail"
-        tools:text="Soon you will have glutes of steel." />
+        <Button
+            android:id="@+id/b_exer_fail"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="@android:color/holo_red_dark"
+            android:onClick="@{() -> viewModel.failExercise(exercise)}"
+            android:text="Fail"
+            android:textColorLink="@android:color/holo_red_dark"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_exer_name" />
 
-</android.support.constraint.ConstraintLayout>
+        <TextView
+            android:id="@+id/tv_exer_message"
+            android:layout_width="0px"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="16dp"
+            android:text="@{exercise.exerMessage}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/b_exer_fail" />
+    </android.support.constraint.ConstraintLayout>
+</layout>

@@ -1,11 +1,9 @@
 package com.epsilon.startbodyweight.selectorActivity
 
 import android.arch.lifecycle.LifecycleOwner
-import android.databinding.DataBindingUtil
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import com.epsilon.startbodyweight.R
 import com.epsilon.startbodyweight.data.ExerciseEntity
 import com.epsilon.startbodyweight.databinding.ExerciseSelectBinding
 
@@ -23,7 +21,7 @@ class ExerciseSelectAdapter(private val mViewModel: SelectorViewModel) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExerciseSelectViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
-        val dataBinding: ExerciseSelectBinding = DataBindingUtil.inflate(layoutInflater, R.layout.exercise_select, parent, false)
+        val dataBinding = ExerciseSelectBinding.inflate(layoutInflater, parent, false)
         dataBinding.viewModel = mViewModel
         dataBinding.setLifecycleOwner(parent.context as LifecycleOwner)
         return ExerciseSelectViewHolder(dataBinding)

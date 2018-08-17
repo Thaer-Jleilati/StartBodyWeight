@@ -2,7 +2,6 @@ package com.epsilon.startbodyweight.selectorActivity
 
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
-import android.content.res.Resources
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
@@ -31,16 +30,38 @@ class SelectorActivity : AppCompatActivity() {
         mExerciseSelectAdapter = ExerciseSelectAdapter(mViewModel)
 
         setupRecyclerView()
-        loadExerciseList(intent.hasExtra("LOAD_FROM_DB"), resources)
+        loadExerciseList(intent.hasExtra("LOAD_FROM_DB"))
     }
 
-    private fun setupRecyclerView(){
+    private fun setupRecyclerView() {
         rv_select_exers.layoutManager = LinearLayoutManager(this)
         rv_select_exers.setHasFixedSize(true)
         rv_select_exers.adapter = mExerciseSelectAdapter
     }
 
-    private fun loadExerciseList(loadFromDB: Boolean, resources: Resources) {
+    fun saveExerciseSelections(v: View) {
+        // Save our exercise list to the DB
+        val db = RoomDB.get(this)
+        doAsync {
+            val exerciseListToSave =
+                    if (mViewModel.exerciseList.value != null) mViewModel.exerciseList.value!!
+                    else ArrayList()
+            val rowsAdded = db?.Dao()?.updateAll(exerciseListToSave)
+            uiThread {
+                if (rowsAdded.orEmpty().size != exerciseListToSave.size) {
+                    Log.e(LTAG, "Failed to add selected exercises to Database.")
+                }
+                if (it.intent.hasExtra("SELECTED_FROM_MAIN_MENU")) {
+                    startActivity(Intent(it, MainActivity::class.java))
+                } else {
+                    startActivity(Intent(it, WorkoutActivity::class.java))
+                }
+            }
+        }
+    }
+
+
+    private fun loadExerciseList(loadFromDB: Boolean) {
         Log.d(LTAG, "Adding select exercise list views. Load from DB: $loadFromDB")
 
         val completeExerciseList = ExerData.getExerciseList(resources)
@@ -73,27 +94,6 @@ class SelectorActivity : AppCompatActivity() {
                 }
 
                 mExerciseSelectAdapter.notifyDataSetChanged() // TODO test if needed?
-            }
-        }
-    }
-
-    fun saveExerciseSelections(v: View) {
-        // Save our exercise list to the DB
-        val db = RoomDB.get(this)
-        doAsync {
-            val exerciseListToSave =
-                    if (mViewModel.exerciseList.value != null) mViewModel.exerciseList.value!!
-                    else ArrayList()
-            val rowsAdded = db?.Dao()?.updateAll(exerciseListToSave)
-            uiThread {
-                if (rowsAdded.orEmpty().size != exerciseListToSave.size) {
-                    Log.e(LTAG, "Failed to add selected exercises to Database.")
-                }
-                if (it.intent.hasExtra("SELECTED_FROM_MAIN_MENU")) {
-                    startActivity(Intent(it, MainActivity::class.java))
-                } else {
-                    startActivity(Intent(it, WorkoutActivity::class.java))
-                }
             }
         }
     }

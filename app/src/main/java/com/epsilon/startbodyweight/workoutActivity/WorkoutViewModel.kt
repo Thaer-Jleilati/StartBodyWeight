@@ -1,17 +1,21 @@
-package com.epsilon.startbodyweight.viewmodel
+package com.epsilon.startbodyweight.workoutActivity
 
+import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import com.epsilon.startbodyweight.data.ExerData
 import com.epsilon.startbodyweight.data.Exercise
 import com.epsilon.startbodyweight.data.ExerciseEntity
+import com.example.android.architecture.blueprints.todoapp.SingleLiveEvent
 
 class WorkoutViewModel : ViewModel() {
-    var mExerciseList = ArrayList<ExerciseEntity>()
+    var mExerciseList = ArrayList<MutableLiveData<ExerciseEntity>>()
     var mIncludeDips: Boolean = false
+    var mWaitTime: Int = 0
+    private val _setCompletionEvent = SingleLiveEvent<ExerciseEntity>()
+    val setCompletionEvent: LiveData<ExerciseEntity>
+        get() = _setCompletionEvent
 
-    init {
-        mExerciseList = ArrayList()
-    }
 
     private fun initializeExerciseEntity(exercise: ExerciseEntity) {
         exercise.nextSet1Reps = exercise.set1Reps
@@ -35,12 +39,16 @@ class WorkoutViewModel : ViewModel() {
 
             // Load our progression list for each exercise from the JSON data and add it to our exercise data
             var exerciseEntryInList = completeExerciseList[it.exerciseNum]
-            it.allProgressions = if (exerciseEntryInList != null) exerciseEntryInList.progs else ArrayList()
+            it.allProgressions = exerciseEntryInList?.progs ?: ArrayList()
+
+            val exerciseToAdd = MutableLiveData<ExerciseEntity>()
+            exerciseToAdd.value = it
+            mExerciseList.add(exerciseToAdd)
         }
     }
 
 
-    fun setNextProgression(exercise: ExerciseEntity) {
+    private fun setNextProgression(exercise: ExerciseEntity) {
         // Move up in our progession
         if (exercise.progressionNumber + 1 < exercise.allProgressions.size) {
             exercise.nextProgressionNumber = exercise.progressionNumber + 1
@@ -53,7 +61,7 @@ class WorkoutViewModel : ViewModel() {
         }
     }
 
-    fun passExercise(exercise: ExerciseEntity) {
+    private fun passExercise(exercise: ExerciseEntity) {
         exercise.isModified = true
 
         // Since we passed, reset our number of attempts
@@ -73,30 +81,35 @@ class WorkoutViewModel : ViewModel() {
         }
     }
 
-    fun failExercise(exercise: ExerciseEntity) {
-        exercise.isModified = true
-        exercise.nextNumAttempts = exercise.numAttempts + 1
-        exercise.exerMessage = "Failure is essential. Try again next workout."
+    fun failExercise(exercise: MutableLiveData<ExerciseEntity>) {
+        exercise.value?.let { exercise ->
+            exercise.isModified = true
+            exercise.nextNumAttempts = exercise.numAttempts + 1
+            exercise.exerMessage = "Failure is essential. Try again next workout."
 
-        if (exercise.nextNumAttempts >= 2) {
-            ExerData.decrementExercise(exercise)
+            if (exercise.nextNumAttempts >= 2) {
+                ExerData.decrementExercise(exercise)
 
-            exercise.nextNumAttempts = 0
-            exercise.exerMessage = if (exercise.isTimedExercise) {
-                "2nd attempt at exercise. Lowering difficulty to ${exercise.nextSetTime} seconds"
-            } else {
-                "2nd attempt at exercise. Lowering difficulty to ${exercise.nextSet1Reps} x ${exercise.nextSet2Reps} x ${exercise.nextSet3Reps}"
+                exercise.nextNumAttempts = 0
+                exercise.exerMessage = if (exercise.isTimedExercise) {
+                    "2nd attempt at exercise. Lowering difficulty to ${exercise.nextSetTime} seconds"
+                } else {
+                    "2nd attempt at exercise. Lowering difficulty to ${exercise.nextSet1Reps} x ${exercise.nextSet2Reps} x ${exercise.nextSet3Reps}"
+                }
+                // TODO: New progression too hard? Do the previous one up until 12 reps
             }
-            // TODO: New progression too hard? Do the previous one up until 12 reps
         }
     }
 
-    fun completeSet(exercise: ExerciseEntity, waitTime: Int) {
+    fun completeSet(exercise: ExerciseEntity) {
         if (exercise.isTimedExercise) {
             completeSetTimed(exercise)
         } else {
-            completeSetReps(exercise, waitTime)
+            completeSetReps(exercise, mWaitTime)
         }
+
+        // Tell our activity our set was completed, this allows it to handle the notifications
+        _setCompletionEvent.value = exercise
     }
 
     private fun completeSetTimed(exercise: ExerciseEntity) {
@@ -139,19 +152,21 @@ class WorkoutViewModel : ViewModel() {
 
     fun completeWorkout() {
         // Update our exercise with our results
-        mExerciseList.forEachIndexed { _, it ->
-            // Automatically pass all untouched exercises
-            if (!it.isModified) {
-                passExercise(it)
-            }
+        mExerciseList.forEach { it ->
+            it.value?.let {
+                // Automatically pass all untouched exercises
+                if (!it.isModified) {
+                    passExercise(it)
+                }
 
-            it.progressionName = it.nextProgressionName
-            it.progressionNumber = it.nextProgressionNumber
-            it.set1Reps = it.nextSet1Reps
-            it.set2Reps = it.nextSet2Reps
-            it.set3Reps = it.nextSet3Reps
-            it.setTime = it.nextSetTime
-            it.numAttempts = it.nextNumAttempts
+                it.progressionName = it.nextProgressionName
+                it.progressionNumber = it.nextProgressionNumber
+                it.set1Reps = it.nextSet1Reps
+                it.set2Reps = it.nextSet2Reps
+                it.set3Reps = it.nextSet3Reps
+                it.setTime = it.nextSetTime
+                it.numAttempts = it.nextNumAttempts
+            }
         }
     }
 }

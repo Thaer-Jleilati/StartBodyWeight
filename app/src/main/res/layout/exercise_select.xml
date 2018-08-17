@@ -8,7 +8,6 @@
         <variable
             name="spinnerAdapter"
             type="android.widget.ArrayAdapter" />
-
         <variable
             name="index"
             type="int" />
