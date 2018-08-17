@@ -2,9 +2,11 @@
     <string name="app_name">StartBodyWeight</string>
     <string name="menu_settings">Settings</string>
 
-    <string name="b_start">▶</string>
+    <string name="b_start">\u25B7</string>
     <string name="b_pause">⏸️</string>
     <string name="b_restart">⟳</string>
+    <string name="b_checkmark">\u2713</string>
+    <string name="b_cross">\u2715</string>
 
     <string name="pref_include_dips_key" translatable="false">include_dips</string>
 
