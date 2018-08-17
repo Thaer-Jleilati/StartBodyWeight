@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.SystemClock
 import android.preference.PreferenceManager
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
@@ -148,9 +149,16 @@ class WorkoutActivity : AppCompatActivity() {
                 if (rowsAdded.orEmpty().size != mViewModel.mExerciseList.size) {
                     Log.e(LTAG, "Failed to add updated exercises to Database.")
                 }
-                // End current activity
-                finish()
-                startActivity(Intent(it, MainActivity::class.java))
+                AlertDialog.Builder(it)
+                        .setTitle("Complete workout?")
+                        .setMessage("All the exercises not selected as 'FAIL' will be set as completed.")
+                        .setIcon(android.R.drawable.checkbox_on_background)
+                        .setNegativeButton(android.R.string.no, null)
+                        .setPositiveButton(android.R.string.yes) { _, _ ->
+                            // End current activity
+                            finish()
+                            startActivity(Intent(it, MainActivity::class.java))
+                        }.show()
             }
         }
     }
