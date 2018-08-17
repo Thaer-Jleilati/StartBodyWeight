@@ -81,8 +81,8 @@ class WorkoutViewModel : ViewModel() {
         }
     }
 
-    fun failExercise(exercise: MutableLiveData<ExerciseEntity>) {
-        exercise.value?.let { exercise ->
+    fun failExercise(exerciseLiveData: MutableLiveData<ExerciseEntity>) {
+        exerciseLiveData.value?.let { exercise ->
             exercise.isModified = true
             exercise.nextNumAttempts = exercise.numAttempts + 1
             exercise.exerMessage = "Failure is essential. Try again next workout."
@@ -98,18 +98,25 @@ class WorkoutViewModel : ViewModel() {
                 }
                 // TODO: New progression too hard? Do the previous one up until 12 reps
             }
+
+            // Update our livedata
+            exerciseLiveData.value = exercise
         }
     }
 
-    fun completeSet(exercise: ExerciseEntity) {
-        if (exercise.isTimedExercise) {
-            completeSetTimed(exercise)
-        } else {
-            completeSetReps(exercise, mWaitTime)
-        }
+    fun completeSet(exerciseLiveData: MutableLiveData<ExerciseEntity>) {
+        exerciseLiveData.value?.let { exercise ->
+            if (exercise.isTimedExercise) {
+                completeSetTimed(exercise)
+            } else {
+                completeSetReps(exercise, mWaitTime)
+            }
 
-        // Tell our activity our set was completed, this allows it to handle the notifications
-        _setCompletionEvent.value = exercise
+            // Tell our activity our set was completed, this allows it to handle the notifications
+            _setCompletionEvent.value = exercise
+            // Update our livedata
+            exerciseLiveData.value = exercise
+        }
     }
 
     private fun completeSetTimed(exercise: ExerciseEntity) {

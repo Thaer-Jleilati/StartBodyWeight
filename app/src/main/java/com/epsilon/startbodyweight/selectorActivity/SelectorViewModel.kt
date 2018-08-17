@@ -40,9 +40,6 @@ class SelectorViewModel : ViewModel() {
         exercise.set1Reps = reps1
         exercise.set2Reps = reps2
         exercise.set3Reps = reps3
-
-        // Force our livedata to detect a change
-        mExerciseList.value = mExerciseList.value
     }
 
     fun incrementSet(exercise: ExerciseEntity, smallIncrement: Boolean = true) {
@@ -64,6 +61,9 @@ class SelectorViewModel : ViewModel() {
 
             updateRepsInExercise(exercise, numReps1, numReps2, numReps3)
         }
+
+        // Force our livedata to detect a change
+        mExerciseList.value = mExerciseList.value
     }
 
     fun decrementSet(exercise: ExerciseEntity, smallDecrement: Boolean = true) {
@@ -85,6 +85,9 @@ class SelectorViewModel : ViewModel() {
 
             updateRepsInExercise(exercise, numReps1, numReps2, numReps3)
         }
+
+        // Force our livedata to detect a change
+        mExerciseList.value = mExerciseList.value
     }
 
     fun onItemSelectedSpinner(parent: View, position: Int, exercise: ExerciseEntity){

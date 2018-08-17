@@ -53,6 +53,7 @@ class WorkoutActivity : AppCompatActivity() {
                 if (!exercise.isTimedExercise) {
                     // Cancel notifications if we just completed all the sets
                     if (exercise.isSet1Complete && exercise.isSet2Complete && exercise.isSet3Complete) {
+                        chronoButtonInitialize()
                         NotificationUtil.cancelPendingNotification(this)
                     }
                     // Otherwise, if we are still working on the exercise, schedule a notification
@@ -81,7 +82,12 @@ class WorkoutActivity : AppCompatActivity() {
     }
 
     private fun setupChron() {
-        cr_chronometer.stop() // Ensure it is stopped at the beginning
+        chronoButtonInitialize() // Ensure it is stopped at the beginning
+    }
+
+    private fun chronoButtonInitialize() {
+        cr_chronometer.stop()
+        chronoButtonResetTime()
     }
 
     fun chronoButtonStartPause(v: View) {
@@ -97,13 +103,13 @@ class WorkoutActivity : AppCompatActivity() {
         }
     }
 
-    fun chronoButtonResetTime(v: View?) {
+    fun chronoButtonResetTime(v: View? = null) {
         cr_chronometer.base = SystemClock.elapsedRealtime()
         mTimeElapsedChron = 0
     }
 
     private fun chronoButtonRestart() {
-        chronoButtonResetTime(null)
+        chronoButtonResetTime()
         cr_chronometer.start()
     }
 
@@ -142,6 +148,8 @@ class WorkoutActivity : AppCompatActivity() {
                 if (rowsAdded.orEmpty().size != mViewModel.mExerciseList.size) {
                     Log.e(LTAG, "Failed to add updated exercises to Database.")
                 }
+                // End current activity
+                finish()
                 startActivity(Intent(it, MainActivity::class.java))
             }
         }
