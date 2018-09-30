@@ -34,7 +34,7 @@ class WorkoutActivity : AppCompatActivity() {
         setContentView(R.layout.activity_workout)
 
         mViewModel = ViewModelProviders.of(this).get(WorkoutViewModel::class.java)
-        mWorkoutItemAdapter = WorkoutItemAdapter(mViewModel, this)
+        mWorkoutItemAdapter = WorkoutItemAdapter(mViewModel)
 
         mWaitTime = resources.getInteger(R.integer.wait_time_in_seconds)
         mViewModel.mWaitTime = mWaitTime
@@ -133,7 +133,8 @@ class WorkoutActivity : AppCompatActivity() {
                     Log.e(LTAG, "No workout data found in DB when entering WorkoutActivity.")
                 } else {
                     mViewModel.populateExerciseListFromDB(myDBExercises, completeExerciseList)
-                    mWorkoutItemAdapter.notifyDataSetChanged() //TODO necessary?
+                    // We absolutely need this
+                    mWorkoutItemAdapter.notifyDataSetChanged()
                 }
             }
         }

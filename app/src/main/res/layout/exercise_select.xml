@@ -1,17 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
+
     <data>
-        <import type="android.view.View"/>
+
+        <import type="android.view.View" />
+
+        <import type="com.epsilon.startbodyweight.data.ExerciseEntity" />
+
         <variable
             name="viewModel"
-            type="com.epsilon.startbodyweight.selectorActivity.SelectorViewModel"/>
+            type="com.epsilon.startbodyweight.selectorActivity.SelectorViewModel" />
+
         <variable
             name="spinnerAdapter"
             type="android.widget.ArrayAdapter" />
+
         <variable
-            name="index"
-            type="int" />
+            name="exercise"
+            type="android.arch.lifecycle.MutableLiveData&lt;ExerciseEntity&gt;" />
     </data>
 
     <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -25,8 +32,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
-            android:checked="@{viewModel.exerciseList[index].isActive}"
-            android:onCheckedChanged="@{(checkBox, isChecked) -> viewModel.onCheckedChanged(checkBox,isChecked,viewModel.exerciseList[index])}"
+            android:checked="@{exercise.isActive}"
+            android:onCheckedChanged="@{(checkBox, isChecked) -> viewModel.onCheckedChanged(checkBox,isChecked,exercise)}"
             app:layout_constraintBottom_toBottomOf="@+id/sp_sel_exer"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
@@ -37,13 +44,13 @@
             android:id="@+id/sp_sel_exer"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
             android:adapter="@{spinnerAdapter}"
             android:background="@android:drawable/btn_dropdown"
-            android:onItemSelected="@{(parent,view,position,id) -> viewModel.onItemSelectedSpinner(parent,position,viewModel.exerciseList[index])}"
-            android:selection="@{viewModel.exerciseList[index].progressionNumber}"
+            android:onItemSelected="@{(parent,view,position,id) -> viewModel.onItemSelectedSpinner(parent,position,exercise)}"
+            android:selection="@{exercise.progressionNumber}"
             android:spinnerMode="dropdown"
             android:textSize="25sp"
             app:layout_constraintEnd_toStartOf="@+id/cb_active_exer"
@@ -56,10 +63,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:minHeight="0dp"
             android:minWidth="0dp"
-            android:text="@{String.valueOf(viewModel.exerciseList[index].set1Reps)}"
-            android:visibility="@{cbActiveExer.checked &amp;&amp; !viewModel.exerciseList[index].isTimedExercise? View.VISIBLE : View.GONE}"
+            android:minHeight="0dp"
+            android:text="@{String.valueOf(exercise.set1Reps)}"
+            android:visibility="@{cbActiveExer.checked &amp;&amp; !exercise.isTimedExercise? View.VISIBLE : View.GONE}"
             app:layout_constraintBottom_toBottomOf="@+id/b_sel_increase_reps_small"
             app:layout_constraintEnd_toStartOf="@+id/tv_sel_rep_2"
             app:layout_constraintStart_toStartOf="parent"
@@ -71,10 +78,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:minHeight="0dp"
             android:minWidth="0dp"
-            android:text="@{String.valueOf(viewModel.exerciseList[index].set2Reps)}"
-            android:visibility="@{cbActiveExer.checked &amp;&amp; !viewModel.exerciseList[index].isTimedExercise? View.VISIBLE : View.GONE}"
+            android:minHeight="0dp"
+            android:text="@{String.valueOf(exercise.set2Reps)}"
+            android:visibility="@{cbActiveExer.checked &amp;&amp; !exercise.isTimedExercise? View.VISIBLE : View.GONE}"
             app:layout_constraintBottom_toBottomOf="@+id/tv_sel_rep_1"
             app:layout_constraintEnd_toStartOf="@+id/tv_sel_rep_3"
             app:layout_constraintStart_toEndOf="@+id/tv_sel_rep_1"
@@ -86,10 +93,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:minHeight="0dp"
             android:minWidth="0dp"
-            android:text="@{String.valueOf(viewModel.exerciseList[index].set3Reps)}"
-            android:visibility="@{cbActiveExer.checked &amp;&amp; !viewModel.exerciseList[index].isTimedExercise? View.VISIBLE : View.GONE}"
+            android:minHeight="0dp"
+            android:text="@{String.valueOf(exercise.set3Reps)}"
+            android:visibility="@{cbActiveExer.checked &amp;&amp; !exercise.isTimedExercise? View.VISIBLE : View.GONE}"
             app:layout_constraintBottom_toBottomOf="@+id/tv_sel_rep_2"
             app:layout_constraintEnd_toStartOf="@+id/b_sel_increase_reps_small"
             app:layout_constraintStart_toEndOf="@+id/tv_sel_rep_2"
@@ -100,10 +107,10 @@
             android:id="@+id/tv_sel_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:minHeight="0dp"
             android:minWidth="0dp"
-            android:text="@{String.valueOf(viewModel.exerciseList[index].setTime)}"
-            android:visibility="@{cbActiveExer.checked &amp;&amp; viewModel.exerciseList[index].isTimedExercise? View.VISIBLE : View.GONE}"
+            android:minHeight="0dp"
+            android:text="@{String.valueOf(exercise.setTime)}"
+            android:visibility="@{cbActiveExer.checked &amp;&amp; exercise.isTimedExercise? View.VISIBLE : View.GONE}"
             app:layout_constraintBottom_toBottomOf="@+id/b_sel_increase_reps_small"
             app:layout_constraintEnd_toStartOf="@+id/b_sel_increase_reps_small"
             app:layout_constraintStart_toStartOf="parent"
@@ -119,9 +126,9 @@
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
-            android:minHeight="0dp"
             android:minWidth="0dp"
-            android:onClick="@{() -> viewModel.incrementSet(viewModel.exerciseList[index], true)}"
+            android:minHeight="0dp"
+            android:onClick="@{() -> viewModel.incrementSet(exercise, true)}"
             android:padding="16dp"
             android:text="↑"
             android:visibility="@{cbActiveExer.checked? View.VISIBLE: View.GONE}"
@@ -137,7 +144,7 @@
             android:layout_margin="8dp"
             android:minWidth="0dp"
             android:minHeight="0dp"
-            android:onClick="@{() -> viewModel.decrementSet(viewModel.exerciseList[index], true)}"
+            android:onClick="@{() -> viewModel.decrementSet(exercise, true)}"
             android:padding="16dp"
             android:text="↓"
             android:visibility="@{cbActiveExer.checked? View.VISIBLE: View.GONE}"

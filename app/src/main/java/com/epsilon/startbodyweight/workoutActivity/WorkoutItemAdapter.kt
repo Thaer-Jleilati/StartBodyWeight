@@ -6,8 +6,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.epsilon.startbodyweight.databinding.WorkoutItemBinding
 
-class WorkoutItemAdapter(private val mViewModel: WorkoutViewModel,
-                         private val mLifecycleOwner: LifecycleOwner) :
+class WorkoutItemAdapter(private val mViewModel: WorkoutViewModel) :
         RecyclerView.Adapter<WorkoutItemViewHolder>() {
 
     init {
@@ -19,7 +18,7 @@ class WorkoutItemAdapter(private val mViewModel: WorkoutViewModel,
         val layoutInflater = LayoutInflater.from(parent.context)
         val dataBinding = WorkoutItemBinding.inflate(layoutInflater, parent, false)
         dataBinding.viewModel = mViewModel
-        dataBinding.setLifecycleOwner(mLifecycleOwner)
+        dataBinding.setLifecycleOwner(parent.context as LifecycleOwner)
         return WorkoutItemViewHolder(dataBinding)
     }
 

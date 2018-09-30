@@ -43,12 +43,9 @@ class SelectorActivity : AppCompatActivity() {
         // Save our exercise list to the DB
         val db = RoomDB.get(this)
         doAsync {
-            val exerciseListToSave =
-                    if (mViewModel.exerciseList.value != null) mViewModel.exerciseList.value!!
-                    else ArrayList()
-            val rowsAdded = db?.Dao()?.updateAll(exerciseListToSave)
+            val rowsAdded = db?.Dao()?.updateAll(mViewModel.mExerciseList.map { it -> it.value!! })
             uiThread {
-                if (rowsAdded.orEmpty().size != exerciseListToSave.size) {
+                if (rowsAdded.orEmpty().size != mViewModel.mExerciseList.size) {
                     Log.e(LTAG, "Failed to add selected exercises to Database.")
                 }
                 if (it.intent.hasExtra("SELECTED_FROM_MAIN_MENU")) {
@@ -93,7 +90,8 @@ class SelectorActivity : AppCompatActivity() {
                     mViewModel.populateExerciseListFromJson(completeExerciseList)
                 }
 
-                mExerciseSelectAdapter.notifyDataSetChanged() // TODO test if needed?
+                // We absolutely need this
+                mExerciseSelectAdapter.notifyDataSetChanged()
             }
         }
     }
