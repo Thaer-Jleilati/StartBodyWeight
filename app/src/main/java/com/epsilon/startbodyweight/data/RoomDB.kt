@@ -9,7 +9,7 @@ import android.content.Context
 import android.util.Log
 import com.epsilon.startbodyweight.selectorActivity.SelectorActivity
 
-@Database(entities = [ExerciseEntity::class], version = 10)
+@Database(entities = [ExerciseEntity::class], version = 11)
 abstract class RoomDB : RoomDatabase() {
     val LTAG = SelectorActivity::class.qualifiedName
 
@@ -44,9 +44,9 @@ abstract class RoomDB : RoomDatabase() {
             instance = null
         }
 
-        private val MIGRATION_KEEP_SAME_8_9: Migration = object : Migration(9, 10) {
+        private val MIGRATION_KEEP_SAME_8_9: Migration = object : Migration(10, 11) {
             override fun migrate(database: SupportSQLiteDatabase) {
-              // Do nothing, no columns changed
+                database.execSQL("ALTER TABLE ExerciseEntity ADD COLUMN isActive BOOLEAN")
             }
         }
     }

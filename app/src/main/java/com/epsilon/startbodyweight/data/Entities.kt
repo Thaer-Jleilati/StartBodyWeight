@@ -17,6 +17,7 @@ data class ExerciseEntity(
         var setTime: Int = 0,
         var isTimedExercise: Boolean = false,
         var numAttempts: Int = 0,
+        var isActive: Boolean = true,
 
         // Do not store the following items in our DB
         @Ignore var allProgressions: ArrayList<String> = ArrayList(),

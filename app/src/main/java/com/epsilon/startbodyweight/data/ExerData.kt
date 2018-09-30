@@ -42,11 +42,21 @@ class ExerData {
         fun convertToExerciseEntityList(jsonExerciseList: Map<Int, Exercise>): List<ExerciseEntity> {
             var sortedExercisesByNum = jsonExerciseList.toSortedMap().values
             return sortedExercisesByNum.map {
-                ExerciseEntity(it.name, it.exerciseNum, "", 0,
-                        MIN_EXERCISE_REPS, MIN_EXERCISE_REPS, MIN_EXERCISE_REPS, MIN_EXERCISE_TIME,
-                        isTimedExercise(it.name),0, it.progs,
-                        0, 0, 0, 0, 0,
-                        "", 0, false)
+                if (it.progs.size == 0) Log.w(LTAG, "Failure in parsing progressions from JSON.")
+
+                var exerciseEntity = ExerciseEntity()
+                exerciseEntity.exerciseName = it.name
+                exerciseEntity.exerciseNum = it.exerciseNum
+                exerciseEntity.set1Reps = MIN_EXERCISE_REPS
+                exerciseEntity.set2Reps = MIN_EXERCISE_REPS
+                exerciseEntity.set3Reps = MIN_EXERCISE_REPS
+                exerciseEntity.setTime = MIN_EXERCISE_TIME
+                exerciseEntity.isTimedExercise = isTimedExercise(it.name)
+                exerciseEntity.allProgressions = it.progs
+                exerciseEntity.progressionNumber = 0
+                exerciseEntity.progressionName = it.progs[0]
+
+                exerciseEntity
             }
         }
 
