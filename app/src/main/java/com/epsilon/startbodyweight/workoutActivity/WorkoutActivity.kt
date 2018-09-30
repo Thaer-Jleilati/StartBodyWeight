@@ -71,9 +71,9 @@ class WorkoutActivity : AppCompatActivity() {
 
     private fun setupPrefs() {
         val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this)
-        mViewModel.mIncludeDips = sharedPrefs.getBoolean(
+        /*mViewModel.mIncludeDips = sharedPrefs.getBoolean(
                 resources.getString(R.string.pref_include_dips_key),
-                resources.getBoolean(R.bool.pref_include_dips_default))
+                resources.getBoolean(R.bool.pref_include_dips_default))*/
     }
 
     private fun setupRecyclerView() {
@@ -123,11 +123,8 @@ class WorkoutActivity : AppCompatActivity() {
 
         val db = RoomDB.get(this)
         doAsync {
-            val myDBExercises = if (mViewModel.mIncludeDips) {
-                db?.Dao()?.getAllMyExercises()
-            } else {
-                db?.Dao()?.getAllMyExercisesExceptDips()
-            }
+            val myDBExercises = db?.Dao()?.getAllMyExercises()
+
             uiThread {
                 if (myDBExercises == null || myDBExercises.isEmpty()) {
                     Log.e(LTAG, "No workout data found in DB when entering WorkoutActivity.")

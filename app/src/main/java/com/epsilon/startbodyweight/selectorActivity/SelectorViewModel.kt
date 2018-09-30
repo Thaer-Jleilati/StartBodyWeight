@@ -99,7 +99,10 @@ class SelectorViewModel : ViewModel() {
         exercise.progressionName = (parent as Spinner).selectedItem.toString()
     }
 
-    fun onCheckedChanged(checkbox: CompoundButton, isChecked: Boolean, exercise: ExerciseEntity) {
-        exercise.isActive = isChecked
+    fun onCheckedChanged(c: CompoundButton, isChecked: Boolean, exerciseLiveData: MutableLiveData<ExerciseEntity>) {
+        exerciseLiveData.value?.let { exercise ->
+            exercise.isActive = isChecked
+            exerciseLiveData.value = exercise
+        }
     }
 }

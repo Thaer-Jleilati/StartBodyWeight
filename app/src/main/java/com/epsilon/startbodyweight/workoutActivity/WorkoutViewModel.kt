@@ -10,7 +10,6 @@ import com.example.android.architecture.blueprints.todoapp.SingleLiveEvent
 
 class WorkoutViewModel : ViewModel() {
     var mExerciseList = ArrayList<MutableLiveData<ExerciseEntity>>()
-    var mIncludeDips: Boolean = false
     var mWaitTime: Int = 0
     private val _setCompletionEvent = SingleLiveEvent<ExerciseEntity>()
     val setCompletionEvent: LiveData<ExerciseEntity>
@@ -34,7 +33,8 @@ class WorkoutViewModel : ViewModel() {
     }
 
     fun populateExerciseListFromDB(myDBExercises: List<ExerciseEntity>, completeExerciseList: Map<Int, Exercise>) {
-        myDBExercises.forEach {
+        // Only keep active exercises
+        myDBExercises.filter { it.isActive }.forEach {
             initializeExerciseEntity(it)
 
             // Load our progression list for each exercise from the JSON data and add it to our exercise data
