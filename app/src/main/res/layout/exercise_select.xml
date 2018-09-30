@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
     <data>
         <import type="android.view.View"/>
         <variable
@@ -12,86 +13,137 @@
             name="index"
             type="int" />
     </data>
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:background="@drawable/exerselect_boder"
+        tools:layout_height="250dp">
+
+        <CheckBox
+            android:id="@+id/cb_active_exer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:checked="@{viewModel.exerciseList[index].isActive}"
+            android:onCheckedChanged="@{(checkBox, isChecked) -> viewModel.onCheckedChanged(checkBox,isChecked,viewModel.exerciseList[index])}"
+            app:layout_constraintBottom_toBottomOf="@+id/sp_sel_exer"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/sp_sel_exer"
+            app:layout_constraintTop_toTopOf="@+id/sp_sel_exer" />
 
         <Spinner
             android:id="@+id/sp_sel_exer"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:layout_weight="20"
+            android:adapter="@{spinnerAdapter}"
             android:background="@android:drawable/btn_dropdown"
+            android:onItemSelected="@{(parent,view,position,id) -> viewModel.onItemSelectedSpinner(parent,position,viewModel.exerciseList[index])}"
+            android:selection="@{viewModel.exerciseList[index].progressionNumber}"
             android:spinnerMode="dropdown"
             android:textSize="25sp"
-            android:adapter="@{spinnerAdapter}"
-            android:onItemSelected="@{(parent,view,position,id) -> viewModel.onItemSelectedSpinner(parent,position,viewModel.exerciseList[index])}"
-            android:selection="@{viewModel.exerciseList[index].progressionNumber}" />
-        <Button
-            android:id="@+id/b_sel_increase_reps_small"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_margin="8dp"
-            android:layout_weight="1"
-            android:minHeight="0dp"
-            android:minWidth="0dp"
-            android:padding="16dp"
-            android:onClick="@{() -> viewModel.incrementSet(viewModel.exerciseList[index], true)}"
-            android:text="↑" />
+            app:layout_constraintEnd_toStartOf="@+id/cb_active_exer"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <TextView
             android:id="@+id/tv_sel_rep_1"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:minHeight="0dp"
             android:minWidth="0dp"
             android:text="@{String.valueOf(viewModel.exerciseList[index].set1Reps)}"
-            android:visibility="@{!viewModel.exerciseList[index].isTimedExercise ? View.VISIBLE : View.GONE}" />
+            android:visibility="@{cbActiveExer.checked &amp;&amp; !viewModel.exerciseList[index].isTimedExercise? View.VISIBLE : View.GONE}"
+            app:layout_constraintBottom_toBottomOf="@+id/b_sel_increase_reps_small"
+            app:layout_constraintEnd_toStartOf="@+id/tv_sel_rep_2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/b_sel_increase_reps_small"
+            tools:text="4" />
+
         <TextView
             android:id="@+id/tv_sel_rep_2"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:minHeight="0dp"
             android:minWidth="0dp"
             android:text="@{String.valueOf(viewModel.exerciseList[index].set2Reps)}"
-            android:visibility="@{!viewModel.exerciseList[index].isTimedExercise ? View.VISIBLE : View.GONE}" />
+            android:visibility="@{cbActiveExer.checked &amp;&amp; !viewModel.exerciseList[index].isTimedExercise? View.VISIBLE : View.GONE}"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_sel_rep_1"
+            app:layout_constraintEnd_toStartOf="@+id/tv_sel_rep_3"
+            app:layout_constraintStart_toEndOf="@+id/tv_sel_rep_1"
+            app:layout_constraintTop_toTopOf="@+id/tv_sel_rep_1"
+            tools:text="4" />
 
         <TextView
             android:id="@+id/tv_sel_rep_3"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
             android:minHeight="0dp"
             android:minWidth="0dp"
             android:text="@{String.valueOf(viewModel.exerciseList[index].set3Reps)}"
-            android:visibility="@{!viewModel.exerciseList[index].isTimedExercise ? View.VISIBLE : View.GONE}" />
+            android:visibility="@{cbActiveExer.checked &amp;&amp; !viewModel.exerciseList[index].isTimedExercise? View.VISIBLE : View.GONE}"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_sel_rep_2"
+            app:layout_constraintEnd_toStartOf="@+id/b_sel_increase_reps_small"
+            app:layout_constraintStart_toEndOf="@+id/tv_sel_rep_2"
+            app:layout_constraintTop_toTopOf="@+id/tv_sel_rep_2"
+            tools:text="4" />
+
         <TextView
             android:id="@+id/tv_sel_time"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
+            android:layout_height="wrap_content"
             android:minHeight="0dp"
             android:minWidth="0dp"
             android:text="@{String.valueOf(viewModel.exerciseList[index].setTime)}"
-            android:visibility="@{viewModel.exerciseList[index].isTimedExercise ? View.VISIBLE : View.GONE}" />
+            android:visibility="@{cbActiveExer.checked &amp;&amp; viewModel.exerciseList[index].isTimedExercise? View.VISIBLE : View.GONE}"
+            app:layout_constraintBottom_toBottomOf="@+id/b_sel_increase_reps_small"
+            app:layout_constraintEnd_toStartOf="@+id/b_sel_increase_reps_small"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/b_sel_increase_reps_small"
+            tools:text="30"
+            tools:visibility="gone" />
+
+        <Button
+            android:id="@+id/b_sel_increase_reps_small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:onClick="@{() -> viewModel.incrementSet(viewModel.exerciseList[index], true)}"
+            android:padding="16dp"
+            android:text="↑"
+            android:visibility="@{cbActiveExer.checked? View.VISIBLE: View.GONE}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/b_sel_reduce_reps_small"
+            app:layout_constraintStart_toEndOf="@id/tv_sel_rep_3"
+            app:layout_constraintTop_toBottomOf="@id/sp_sel_exer" />
+
         <Button
             android:id="@+id/b_sel_reduce_reps_small"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_margin="8dp"
-            android:layout_weight="1"
-            android:minHeight="0dp"
             android:minWidth="0dp"
-            android:padding="16dp"
+            android:minHeight="0dp"
             android:onClick="@{() -> viewModel.decrementSet(viewModel.exerciseList[index], true)}"
-            android:text="↓"/>
-    </LinearLayout>
+            android:padding="16dp"
+            android:text="↓"
+            android:visibility="@{cbActiveExer.checked? View.VISIBLE: View.GONE}"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_sel_time"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/b_sel_increase_reps_small"
+            app:layout_constraintTop_toTopOf="@+id/tv_sel_time" />
+    </android.support.constraint.ConstraintLayout>
 </layout>

@@ -4,12 +4,14 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
 import android.view.View
+import android.widget.CompoundButton
 import android.widget.Spinner
 import com.epsilon.startbodyweight.data.ExerData
 import com.epsilon.startbodyweight.data.Exercise
 import com.epsilon.startbodyweight.data.ExerciseEntity
 import kotlin.math.max
 import kotlin.math.min
+
 
 class SelectorViewModel : ViewModel() {
     private val mExerciseList = MutableLiveData<ArrayList<ExerciseEntity>>()
@@ -93,5 +95,9 @@ class SelectorViewModel : ViewModel() {
     fun onItemSelectedSpinner(parent: View, position: Int, exercise: ExerciseEntity){
         exercise.progressionNumber = position
         exercise.progressionName = (parent as Spinner).selectedItem.toString()
+    }
+
+    fun onCheckedChanged(checkbox: CompoundButton, isChecked: Boolean, exercise: ExerciseEntity) {
+        exercise.isActive = isChecked
     }
 }
