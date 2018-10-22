@@ -36,7 +36,6 @@
             android:onCheckedChanged="@{(checkBox, isChecked) -> viewModel.onCheckedChanged(checkBox,isChecked,exercise)}"
             app:layout_constraintBottom_toBottomOf="@+id/sp_sel_exer"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/sp_sel_exer"
             app:layout_constraintTop_toTopOf="@+id/sp_sel_exer" />
 
@@ -54,7 +53,6 @@
             android:spinnerMode="dropdown"
             android:textSize="25sp"
             app:layout_constraintEnd_toStartOf="@+id/cb_active_exer"
-            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -69,6 +67,7 @@
             android:visibility="@{exercise.isActive &amp;&amp; !exercise.isTimedExercise? View.VISIBLE : View.GONE}"
             app:layout_constraintBottom_toBottomOf="@+id/b_sel_increase_reps_small"
             app:layout_constraintEnd_toStartOf="@+id/tv_sel_rep_2"
+            app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/b_sel_increase_reps_small"
             tools:text="4" />
@@ -147,7 +146,7 @@
             android:onClick="@{() -> viewModel.decrementSet(exercise, true)}"
             android:padding="16dp"
             android:text="↓"
-            android:visibility="@{exercise.isActive? View.VISIBLE: View.GONE}"
+            android:visibility="@{cbActiveExer.checked? View.VISIBLE: View.GONE}"
             app:layout_constraintBottom_toBottomOf="@+id/tv_sel_time"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/b_sel_increase_reps_small"
