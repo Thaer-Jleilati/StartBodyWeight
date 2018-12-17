@@ -22,6 +22,7 @@ class ExerciseEntity(
         var isTimedExercise: Boolean = false,
         var numAttempts: Int = 0,
         var isActive: Boolean = true,
+        var extraNote: String = "",
 
         // Do not store the following items in our DB
         @Ignore var allProgressions: ArrayList<String> = ArrayList(),

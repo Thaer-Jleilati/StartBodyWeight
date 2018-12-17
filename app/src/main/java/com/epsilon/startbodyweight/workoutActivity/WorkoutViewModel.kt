@@ -16,6 +16,9 @@ class WorkoutViewModel : ViewModel() {
     private val _setCompletionEvent = SingleLiveEvent<ExerciseEntity>()
     val setCompletionEvent: LiveData<ExerciseEntity>
         get() = _setCompletionEvent
+    private val _openNoteEvent = SingleLiveEvent<ExerciseEntity>()
+    val openNoteEvent: LiveData<ExerciseEntity>
+        get() = _openNoteEvent
 
 
     private fun initializeExerciseEntity(exercise: ExerciseEntity) {
@@ -127,6 +130,12 @@ class WorkoutViewModel : ViewModel() {
             exerciseLiveData.value = exercise
         }
 
+    }
+
+    fun openNote(exerciseLiveData: MutableLiveData<ExerciseEntity>) {
+        exerciseLiveData.value?.let { exercise ->
+            _openNoteEvent.value = exercise
+        }
     }
 
     fun completeSet(exerciseLiveData: MutableLiveData<ExerciseEntity>) {

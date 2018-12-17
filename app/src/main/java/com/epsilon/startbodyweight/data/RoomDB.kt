@@ -9,7 +9,7 @@ import android.content.Context
 import android.util.Log
 import com.epsilon.startbodyweight.selectorActivity.SelectorActivity
 
-@Database(entities = [ExerciseEntity::class], version = 11)
+@Database(entities = [ExerciseEntity::class], version = 12)
 abstract class RoomDB : RoomDatabase() {
     val LTAG = SelectorActivity::class.qualifiedName
 
@@ -28,7 +28,7 @@ abstract class RoomDB : RoomDatabase() {
                     Log.d(LTAG, "Building new Room DB instance....")
                     instance = Room.databaseBuilder(context, RoomDB::class.java, "sbw_database").
                             // Can implement if we update database
-                            //addMigrations(MIGRATION_KEEP_SAME_8_9).
+                            addMigrations(MIGRATION_KEEP_SAME_8_9).
                             fallbackToDestructiveMigration().
                             build()
                     Log.d(LTAG, "Built new Room DB instance.")
@@ -44,9 +44,9 @@ abstract class RoomDB : RoomDatabase() {
             instance = null
         }
 
-        private val MIGRATION_KEEP_SAME_8_9: Migration = object : Migration(10, 11) {
+        private val MIGRATION_KEEP_SAME_8_9: Migration = object : Migration(11, 12) {
             override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL("ALTER TABLE ExerciseEntity ADD COLUMN isActive BOOLEAN")
+                database.execSQL("ALTER TABLE ExerciseEntity ADD COLUMN extraNote TEXT NOT NULL DEFAULT ''")
             }
         }
     }

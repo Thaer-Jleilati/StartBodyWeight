@@ -3,20 +3,30 @@ package com.epsilon.startbodyweight.workoutActivity
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
 import android.preference.PreferenceManager
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
+import android.transition.Slide
+import android.transition.TransitionManager
 import android.util.Log
+import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
+import android.widget.LinearLayout
+import android.widget.PopupWindow
+import android.widget.Toast
 import com.epsilon.startbodyweight.MainActivity
+import com.epsilon.startbodyweight.R
 import com.epsilon.startbodyweight.data.ExerData
 import com.epsilon.startbodyweight.data.RoomDB
 import com.epsilon.startbodyweight.notif.NotificationUtil
 import kotlinx.android.synthetic.main.activity_workout.*
+import kotlinx.android.synthetic.main.notes_popup.view.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
 
@@ -56,6 +66,52 @@ class WorkoutActivity : AppCompatActivity() {
                     chronoButtonRestart()
                     NotificationUtil.scheduleNotification(this, "Ready to go", "Perform your next set now.", exercise.nextSetRestTime)
                 }
+            }
+        })
+
+        mViewModel.openNoteEvent.observe(this, Observer {
+            it?.let { exercise ->
+                // Inflate a custom view using layout inflater
+                val notesPopupView = LayoutInflater.from(this).inflate(R.layout.notes_popup, null)
+
+                // Initialize a new instance of popup window
+                val popupWindow = PopupWindow(notesPopupView,
+                        LinearLayout.LayoutParams.WRAP_CONTENT, // Width of popup window
+                        LinearLayout.LayoutParams.WRAP_CONTENT // Window height
+                )
+
+                // Set an elevation for the popup window
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    popupWindow.elevation = 10.0F
+                }
+
+                // If API level 23 or higher then execute the code
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    // Create a new slide animation for popup window enter transition
+                    val slideIn = Slide()
+                    slideIn.slideEdge = Gravity.TOP
+                    popupWindow.enterTransition = slideIn
+
+                    // Slide animation for popup window exit transition
+                    val slideOut = Slide()
+                    slideOut.slideEdge = Gravity.BOTTOM
+                    popupWindow.exitTransition = slideOut
+                }
+
+                notesPopupView.et_note.setText(exercise.extraNote)
+                notesPopupView.b_close.setOnClickListener { popupWindow.dismiss() }
+
+                // Set a dismiss listener for popup window
+                popupWindow.setOnDismissListener {
+                    exercise.extraNote = popupWindow.contentView.et_note.text.toString()
+                    Toast.makeText(applicationContext, "Note saved.", Toast.LENGTH_SHORT).show()
+                }
+
+                // Enable focusing on the edit text
+                popupWindow.isFocusable = true
+
+                TransitionManager.beginDelayedTransition(rv_workout_exers)
+                popupWindow.showAtLocation(rv_workout_exers, Gravity.CENTER, 0, 0)
             }
         })
     }

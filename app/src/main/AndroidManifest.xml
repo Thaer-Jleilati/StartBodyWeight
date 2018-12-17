@@ -16,10 +16,10 @@
             android:theme="@style/Theme.AppCompat.Light">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <!-- Keep only a single workout activity, and bring the existing instance to the front of the stack if its opened from a notification -->
+        </activity> <!-- Keep only a single workout activity, and bring the existing instance to the front of the stack if its opened from a notification -->
         <activity
             android:name=".workoutActivity.WorkoutActivity"
             android:launchMode="singleTask"
@@ -41,12 +41,10 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
-        </activity>
-        <!-- Note: we do not need any intent filters because we call the class explicitly -->
+        </activity> <!-- Note: we do not need any intent filters because we call the class explicitly -->
         <receiver
             android:name=".notif.NotificationReceiver"
-            android:exported="false">
-        </receiver>
+            android:exported="false"></receiver>
     </application>
 
 </manifest>
