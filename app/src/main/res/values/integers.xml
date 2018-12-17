@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <integer name="wait_time_in_seconds">150</integer>
+    <integer name="wait_time_regular_in_seconds">120</integer>
+    <integer name="wait_time_failed_in_seconds">180</integer>
 </resources>

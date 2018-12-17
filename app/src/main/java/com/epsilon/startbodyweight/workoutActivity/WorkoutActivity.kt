@@ -26,7 +26,6 @@ class WorkoutActivity : AppCompatActivity() {
     private val LTAG = WorkoutActivity::class.qualifiedName
     private lateinit var mWorkoutItemAdapter: WorkoutItemAdapter
     private lateinit var mViewModel: WorkoutViewModel
-    private var mWaitTime: Int = 0
     var mTimeElapsedChron = 0L
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -36,8 +35,8 @@ class WorkoutActivity : AppCompatActivity() {
         mViewModel = ViewModelProviders.of(this).get(WorkoutViewModel::class.java)
         mWorkoutItemAdapter = WorkoutItemAdapter(mViewModel)
 
-        mWaitTime = resources.getInteger(R.integer.wait_time_in_seconds)
-        mViewModel.mWaitTime = mWaitTime
+        mViewModel.mWaitTimeRegular = resources.getInteger(R.integer.wait_time_regular_in_seconds)
+        mViewModel.mWaitTimeFailed = resources.getInteger(R.integer.wait_time_failed_in_seconds)
 
         setupPrefs()
         setupChron()
@@ -47,23 +46,17 @@ class WorkoutActivity : AppCompatActivity() {
 
         mViewModel.setCompletionEvent.observe(this, Observer {
             it?.let { exercise ->
-                val waitTime = resources.getInteger(R.integer.wait_time_in_seconds)
-
                 // Handle the notifications
                 NotificationUtil.clearAllNotifications(this)
-                if (!exercise.isTimedExercise) {
-                    // Cancel notifications if we just completed all the sets
-                    if (exercise.isSet1Complete && exercise.isSet2Complete && exercise.isSet3Complete) {
-                        chronoButtonInitialize()
-                        NotificationUtil.cancelPendingNotification(this)
-                    }
-                    // Otherwise, if we are still working on the exercise, schedule a notification
-                    else if (exercise.isSet1Complete || exercise.isSet2Complete) {
-                        chronoButtonRestart()
-                        NotificationUtil.scheduleNotification(this, "Ready to go", "Perform your next set now.", waitTime)
-                    }
-                } else {
-                    if (exercise.isSetTimeComplete) NotificationUtil.cancelPendingNotification(this)
+                // Cancel notifications if we just completed all the sets
+                if (exercise.allSetsAttempted()) {
+                    chronoButtonInitialize()
+                    NotificationUtil.cancelPendingNotification(this)
+                }
+                // Otherwise, if we are still working on the exercise, schedule a notification
+                else {
+                    chronoButtonRestart()
+                    NotificationUtil.scheduleNotification(this, "Ready to go", "Perform your next set now.", exercise.nextSetRestTime)
                 }
             }
         })

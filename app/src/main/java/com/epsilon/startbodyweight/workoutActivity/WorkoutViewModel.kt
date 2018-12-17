@@ -6,11 +6,13 @@ import android.arch.lifecycle.ViewModel
 import com.epsilon.startbodyweight.data.ExerData
 import com.epsilon.startbodyweight.data.Exercise
 import com.epsilon.startbodyweight.data.ExerciseEntity
-import com.example.android.architecture.blueprints.todoapp.SingleLiveEvent
+import com.epsilon.startbodyweight.data.ExerciseSetState
+import com.epsilon.startbodyweight.notif.SingleLiveEvent
 
 class WorkoutViewModel : ViewModel() {
     var mExerciseList = ArrayList<MutableLiveData<ExerciseEntity>>()
-    var mWaitTime: Int = 0
+    var mWaitTimeRegular: Int = 0
+    var mWaitTimeFailed: Int = 0
     private val _setCompletionEvent = SingleLiveEvent<ExerciseEntity>()
     val setCompletionEvent: LiveData<ExerciseEntity>
         get() = _setCompletionEvent
@@ -24,12 +26,12 @@ class WorkoutViewModel : ViewModel() {
         exercise.nextProgressionName = exercise.progressionName
         exercise.nextProgressionNumber = exercise.progressionNumber
         exercise.nextNumAttempts = exercise.numAttempts
-        exercise.isModified = false
         exercise.exerMessage = ""
-        exercise.isSet1Complete = false
-        exercise.isSet2Complete = false
-        exercise.isSet3Complete = false
-        exercise.isSetTimeComplete = false
+        exercise.set1State = ExerciseSetState.NOT_STARTED
+        exercise.set2State = ExerciseSetState.NOT_STARTED
+        exercise.set3State = ExerciseSetState.NOT_STARTED
+        exercise.setTimedState = ExerciseSetState.NOT_STARTED
+        exercise.nextSetRestTime = 0
     }
 
     fun populateExerciseListFromDB(myDBExercises: List<ExerciseEntity>, completeExerciseList: Map<Int, Exercise>) {
@@ -61,9 +63,25 @@ class WorkoutViewModel : ViewModel() {
         }
     }
 
-    private fun passExercise(exercise: ExerciseEntity) {
-        exercise.isModified = true
+    fun failExercise(exercise: ExerciseEntity) {
+        exercise.nextNumAttempts = exercise.numAttempts + 1
+        exercise.exerMessage = "Failure is essential. Try again next workout."
 
+        if (exercise.nextNumAttempts >= 2) {
+            ExerData.decrementExercise(exercise)
+
+            exercise.nextNumAttempts = 0
+            exercise.exerMessage = if (exercise.isTimedExercise) {
+                "2nd attempt at exercise. Lowering difficulty to ${exercise.nextSetTime} seconds"
+            } else {
+                "2nd attempt at exercise. Lowering difficulty to ${exercise.nextSet1Reps} x ${exercise.nextSet2Reps} x ${exercise.nextSet3Reps}"
+            }
+            // TODO: New progression too hard? Do the previous one up until 12 reps
+        }
+    }
+
+
+    private fun passExercise(exercise: ExerciseEntity) {
         // Since we passed, reset our number of attempts
         exercise.nextNumAttempts = 0
 
@@ -81,27 +99,34 @@ class WorkoutViewModel : ViewModel() {
         }
     }
 
-    fun failExercise(exerciseLiveData: MutableLiveData<ExerciseEntity>) {
+    fun failSet(exerciseLiveData: MutableLiveData<ExerciseEntity>) {
         exerciseLiveData.value?.let { exercise ->
-            exercise.isModified = true
-            exercise.nextNumAttempts = exercise.numAttempts + 1
-            exercise.exerMessage = "Failure is essential. Try again next workout."
-
-            if (exercise.nextNumAttempts >= 2) {
-                ExerData.decrementExercise(exercise)
-
-                exercise.nextNumAttempts = 0
-                exercise.exerMessage = if (exercise.isTimedExercise) {
-                    "2nd attempt at exercise. Lowering difficulty to ${exercise.nextSetTime} seconds"
-                } else {
-                    "2nd attempt at exercise. Lowering difficulty to ${exercise.nextSet1Reps} x ${exercise.nextSet2Reps} x ${exercise.nextSet3Reps}"
+            exercise.nextSetRestTime = mWaitTimeFailed
+            when {
+                exercise.set1State == ExerciseSetState.NOT_STARTED -> {
+                    exercise.set1State = ExerciseSetState.FAILED
+                    exercise.exerMessage = "Please rest for ${exercise.nextSetRestTime} seconds."
                 }
-                // TODO: New progression too hard? Do the previous one up until 12 reps
+                exercise.set2State == ExerciseSetState.NOT_STARTED -> {
+                    exercise.set2State = ExerciseSetState.FAILED
+                    exercise.exerMessage = "Please rest for ${exercise.nextSetRestTime} seconds."
+
+                }
+                exercise.set3State == ExerciseSetState.NOT_STARTED -> {
+                    exercise.set3State = ExerciseSetState.FAILED
+                    failExercise(exercise)
+                }
+                else -> {
+                    initializeExerciseEntity(exercise)
+                }
             }
 
+            // Tell our activity our set was completed, this allows it to handle the notifications
+            _setCompletionEvent.value = exercise
             // Update our livedata
             exerciseLiveData.value = exercise
         }
+
     }
 
     fun completeSet(exerciseLiveData: MutableLiveData<ExerciseEntity>) {
@@ -109,7 +134,7 @@ class WorkoutViewModel : ViewModel() {
             if (exercise.isTimedExercise) {
                 completeSetTimed(exercise)
             } else {
-                completeSetReps(exercise, mWaitTime)
+                completeSetReps(exercise)
             }
 
             // Tell our activity our set was completed, this allows it to handle the notifications
@@ -121,37 +146,33 @@ class WorkoutViewModel : ViewModel() {
 
     private fun completeSetTimed(exercise: ExerciseEntity) {
         when {
-            !exercise.isSetTimeComplete -> {
-                exercise.isSetTimeComplete = true
+            exercise.setTimedState == ExerciseSetState.NOT_STARTED -> {
+                exercise.setTimedState = ExerciseSetState.PASSED
                 passExercise(exercise)
             }
-            exercise.isSetTimeComplete -> {
-                exercise.isSetTimeComplete = false
+            else -> {
                 initializeExerciseEntity(exercise)
             }
         }
     }
 
-    private fun completeSetReps(exercise: ExerciseEntity, waitTime: Int) {
+    private fun completeSetReps(exercise: ExerciseEntity) {
+        exercise.nextSetRestTime = mWaitTimeRegular
         when {
-            !exercise.isSet1Complete -> {
-                exercise.isSet1Complete = true
-                exercise.exerMessage = "Congratulations. Please rest for $waitTime seconds."
+            exercise.set1State == ExerciseSetState.NOT_STARTED -> {
+                exercise.set1State = ExerciseSetState.PASSED
+                exercise.exerMessage = "Congratulations. Please rest for ${exercise.nextSetRestTime} seconds."
             }
-            !exercise.isSet2Complete -> {
-                exercise.isSet2Complete = true
-                exercise.exerMessage = "Congratulations. Please rest for $waitTime seconds."
+            exercise.set2State == ExerciseSetState.NOT_STARTED -> {
+                exercise.set2State = ExerciseSetState.PASSED
+                exercise.exerMessage = "Congratulations. Please rest for ${exercise.nextSetRestTime} seconds."
 
             }
-            !exercise.isSet3Complete -> {
-                exercise.isSet3Complete = true
-                passExercise(exercise)
+            exercise.set3State == ExerciseSetState.NOT_STARTED -> {
+                exercise.set3State = ExerciseSetState.PASSED
+                if (exercise.anyFailedExercise()) failExercise(exercise) else passExercise(exercise)
             }
             else -> {
-                exercise.isSet1Complete = false
-                exercise.isSet2Complete = false
-                exercise.isSet3Complete = false
-
                 initializeExerciseEntity(exercise)
             }
         }
@@ -161,8 +182,12 @@ class WorkoutViewModel : ViewModel() {
         // Update our exercise with our results
         mExerciseList.forEach { it ->
             it.value?.let {
-                // Automatically pass all untouched exercises
-                if (!it.isModified) {
+
+                if (it.anyFailedExercise()) {
+                    failExercise(it)
+                }
+                // Pass any exercise that user was too lazy to mark as passed
+                else if (it.isSetNotStarted()) {
                     passExercise(it)
                 }
 

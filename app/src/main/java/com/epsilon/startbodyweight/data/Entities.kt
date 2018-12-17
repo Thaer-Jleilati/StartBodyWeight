@@ -5,8 +5,12 @@ import android.arch.persistence.room.Entity
 import android.arch.persistence.room.Ignore
 import android.arch.persistence.room.PrimaryKey
 
+enum class ExerciseSetState {
+    NOT_STARTED, PASSED, FAILED
+}
+
 @Entity
-data class ExerciseEntity(
+class ExerciseEntity(
         var exerciseName: String = "",
         @PrimaryKey var exerciseNum: Int = 0,
         var progressionName: String = "",
@@ -28,10 +32,35 @@ data class ExerciseEntity(
         @Ignore var nextNumAttempts: Int = 0,
         @Ignore var nextProgressionName: String = "",
         @Ignore var nextProgressionNumber: Int = 0,
-        @Ignore var isModified: Boolean = false,
         @Ignore var exerMessage: String = "",
-        @Ignore var isSet1Complete: Boolean = false,
-        @Ignore var isSet2Complete: Boolean = false,
-        @Ignore var isSet3Complete: Boolean = false,
-        @Ignore var isSetTimeComplete: Boolean = false
-)
+        @Ignore var set1State: ExerciseSetState = ExerciseSetState.NOT_STARTED,
+        @Ignore var set2State: ExerciseSetState = ExerciseSetState.NOT_STARTED,
+        @Ignore var set3State: ExerciseSetState = ExerciseSetState.NOT_STARTED,
+        @Ignore var setTimedState: ExerciseSetState = ExerciseSetState.NOT_STARTED,
+        @Ignore var nextSetRestTime: Int = 0
+) {
+    fun anyFailedExercise(): Boolean {
+        return set1State == ExerciseSetState.FAILED ||
+                set2State == ExerciseSetState.FAILED ||
+                set3State == ExerciseSetState.FAILED
+    }
+
+    fun allSetsAttempted(): Boolean {
+        return if (isTimedExercise) {
+            setTimedState != ExerciseSetState.NOT_STARTED
+        } else
+            set1State != ExerciseSetState.NOT_STARTED &&
+                    set2State != ExerciseSetState.NOT_STARTED &&
+                    set3State != ExerciseSetState.NOT_STARTED
+    }
+
+    fun isSetNotStarted(): Boolean {
+        return if (isTimedExercise) {
+            setTimedState == ExerciseSetState.NOT_STARTED
+        } else {
+            set1State == ExerciseSetState.NOT_STARTED &&
+                    set2State == ExerciseSetState.NOT_STARTED &&
+                    set3State == ExerciseSetState.NOT_STARTED
+        }
+    }
+}

@@ -7,6 +7,8 @@
 
         <import type="com.epsilon.startbodyweight.data.ExerciseEntity" />
 
+        <import type="com.epsilon.startbodyweight.data.ExerciseSetState" />
+
         <import type="android.graphics.Color" />
 
         <variable
@@ -40,7 +42,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
-            android:backgroundColor="@{exercise.isSet1Complete? Color.GREEN : Color.TRANSPARENT}"
+            android:backgroundColor="@{exercise.set1State == ExerciseSetState.PASSED? Color.GREEN : (exercise.set1State == ExerciseSetState.FAILED ? Color.RED: Color.TRANSPARENT )}"
             android:onClick="@{() -> viewModel.completeSet(exercise)}"
             android:text="@{String.valueOf(exercise.set1Reps)}"
             android:textSize="24sp"
@@ -55,7 +57,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
-            android:backgroundColor="@{exercise.isSet2Complete? Color.GREEN : Color.TRANSPARENT}"
+            android:backgroundColor="@{exercise.set2State == ExerciseSetState.PASSED? Color.GREEN : (exercise.set2State == ExerciseSetState.FAILED ? Color.RED: Color.TRANSPARENT )}"
             android:text="@{String.valueOf(exercise.set2Reps)}"
             android:textSize="24sp"
             android:visibility="@{!exercise.isTimedExercise ? View.VISIBLE : View.GONE}"
@@ -69,7 +71,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
-            android:backgroundColor="@{exercise.isSet3Complete? Color.GREEN : Color.TRANSPARENT}"
+            android:backgroundColor="@{exercise.set3State == ExerciseSetState.PASSED? Color.GREEN : (exercise.set3State == ExerciseSetState.FAILED ? Color.RED: Color.TRANSPARENT )}"
             android:text="@{String.valueOf(exercise.set3Reps)}"
             android:textSize="24sp"
             android:visibility="@{!exercise.isTimedExercise ? View.VISIBLE : View.GONE}"
@@ -83,7 +85,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="8dp"
-            android:backgroundColor="@{exercise.isSetTimeComplete? Color.GREEN : Color.TRANSPARENT}"
+            android:backgroundColor="@{exercise.setTimedState == ExerciseSetState.PASSED? Color.GREEN : (exercise.setTimedState == ExerciseSetState.FAILED ? Color.RED: Color.TRANSPARENT )}"
             android:text="@{String.valueOf(exercise.setTime)}"
             android:textSize="24sp"
             android:visibility="@{exercise.isTimedExercise ? View.VISIBLE : View.GONE}"
@@ -116,7 +118,7 @@
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="16dp"
             android:backgroundTint="@android:color/holo_red_dark"
-            android:onClick="@{() -> viewModel.failExercise(exercise)}"
+            android:onClick="@{() -> viewModel.failSet(exercise)}"
             android:text="@string/b_cross"
             android:textColorLink="@android:color/holo_red_dark"
             android:textSize="20sp"
