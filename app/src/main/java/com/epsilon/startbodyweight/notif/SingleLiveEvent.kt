@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package com.example.android.architecture.blueprints.todoapp
+package com.epsilon.startbodyweight.notif
 
 import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.MutableLiveData
