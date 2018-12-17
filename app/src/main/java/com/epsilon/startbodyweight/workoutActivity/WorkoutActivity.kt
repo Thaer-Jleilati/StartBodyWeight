@@ -13,14 +13,12 @@ import android.util.Log
 import android.view.View
 import android.widget.Button
 import com.epsilon.startbodyweight.MainActivity
-import com.epsilon.startbodyweight.R
 import com.epsilon.startbodyweight.data.ExerData
 import com.epsilon.startbodyweight.data.RoomDB
 import com.epsilon.startbodyweight.notif.NotificationUtil
 import kotlinx.android.synthetic.main.activity_workout.*
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
-
 
 class WorkoutActivity : AppCompatActivity() {
     private val LTAG = WorkoutActivity::class.qualifiedName
@@ -30,13 +28,13 @@ class WorkoutActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_workout)
+        setContentView(com.epsilon.startbodyweight.R.layout.activity_workout)
 
         mViewModel = ViewModelProviders.of(this).get(WorkoutViewModel::class.java)
         mWorkoutItemAdapter = WorkoutItemAdapter(mViewModel)
 
-        mViewModel.mWaitTimeRegular = resources.getInteger(R.integer.wait_time_regular_in_seconds)
-        mViewModel.mWaitTimeFailed = resources.getInteger(R.integer.wait_time_failed_in_seconds)
+        mViewModel.mWaitTimeRegular = resources.getInteger(com.epsilon.startbodyweight.R.integer.wait_time_regular_in_seconds)
+        mViewModel.mWaitTimeFailed = resources.getInteger(com.epsilon.startbodyweight.R.integer.wait_time_failed_in_seconds)
 
         setupPrefs()
         setupChron()
@@ -86,14 +84,14 @@ class WorkoutActivity : AppCompatActivity() {
 
     fun chronoButtonStartPause(v: View) {
         val button = v as Button
-        if (button.text.toString() == getString(R.string.b_start)) {
+        if (button.text.toString() == getString(com.epsilon.startbodyweight.R.string.b_start)) {
             cr_chronometer.base = SystemClock.elapsedRealtime() - mTimeElapsedChron
             cr_chronometer.start()
-            button.text = getString(R.string.b_pause)
-        } else if (button.text.toString() == getString(R.string.b_pause)) {
+            button.text = getString(com.epsilon.startbodyweight.R.string.b_pause)
+        } else if (button.text.toString() == getString(com.epsilon.startbodyweight.R.string.b_pause)) {
             mTimeElapsedChron = SystemClock.elapsedRealtime() - cr_chronometer.base
             cr_chronometer.stop()
-            button.text = getString(R.string.b_start)
+            button.text = getString(com.epsilon.startbodyweight.R.string.b_start)
         }
     }
 
